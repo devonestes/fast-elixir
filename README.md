@@ -50,14 +50,12 @@ IdiomName.Benchmark.benchmark()
 Idioms
 ------
 
-### Index
+#### Map Lookup vs. Pattern Matching Lookup [code](code/general/map_lookup_vs_pattern_matching.exs)
 
-- [General](#general)
-
-### General
-
-##### Map Lookup vs. Pattern Matching Lookup
-[code](code/general/map_lookup_vs_pattern_matching.exs)
+If you need to lookup static values in a key-value based structure, you might at
+first consider assigning a map as a module attribute and looking that up.
+However, it's significantly faster to use pattern matching to define functions
+that behave like a key-value based data structure.
 
 ```
 $ mix run code/general/map_lookup_vs_pattern_matching.exs
