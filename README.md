@@ -80,6 +80,36 @@ Pattern Matching      726.52 K
 Map Lookup            455.62 K - 1.59x slower
 ```
 
+#### IO Lists vs. String Concatenation [code](code/general/io_lists_vs_concatenation.exs)
+
+Chances are, eventually you'll need to concatenate strings for some sort of
+output. This could be in a web response, a CLI output, or writing to a file. The
+faster way to do this is to use IO Lists rather than string concatenation or
+interpolation.
+
+```
+$ mix run code/general/io_lists_vs_concatenation.exs
+Elixir 1.4.2
+Erlang 19.2.3
+Benchmark suite executing with the following configuration:
+warmup: 2.0s
+time: 10.0s
+parallel: 1
+inputs: none specified
+Estimated total run time: 24.0s
+
+Benchmarking IO List...
+Benchmarking Interpolation...
+
+Name                    ips        average  deviation         median
+IO List             27.12 K       36.87 μs   ±345.26%       33.00 μs
+Interpolation       18.92 K       52.84 μs   ±567.23%       36.00 μs
+
+Comparison:
+IO List             27.12 K
+Interpolation       18.92 K - 1.43x slower
+```
+
 ## Something went wrong
 
 Something look wrong to you? :cry: Have a better example? :heart_eyes: Excellent!
