@@ -132,6 +132,38 @@ split                    274.56 K
 splitter |> to_list       31.03 K - 8.85x slower
 ```
 
+#### `sort` vs. `sort_by` [code](code/general/sort_vs_sort_by.exs)
+
+Sorting a list of maps or keyword lists can be done in various ways,
+given that the key-value you want to sort on is the first one defined
+in the associative data structure. The speed differences are minimal.
+
+```
+↪ mix run code/general/sort_vs_sort_by.exs
+Elixir 1.4.4
+Erlang 19.3
+Benchmark suite executing with the following configuration:
+warmup: 2.0s
+time: 10.0s
+parallel: 1
+inputs: none specified
+Estimated total run time: 36.0s
+
+Benchmarking sort/1...
+Benchmarking sort/2...
+Benchmarking sort_by/2...
+
+Name                ips        average  deviation         median
+sort/1           5.26 K      190.18 μs    ±17.11%      178.00 μs
+sort/2           5.02 K      199.39 μs    ±16.09%      187.00 μs
+sort_by/2        4.82 K      207.35 μs    ±19.17%      197.00 μs
+
+Comparison:
+sort/1           5.26 K
+sort/2           5.02 K - 1.05x slower
+sort_by/2        4.82 K - 1.09x slower
+```
+
 ## Something went wrong
 
 Something look wrong to you? :cry: Have a better example? :heart_eyes: Excellent!
