@@ -1,5 +1,4 @@
-Fast Elixir 
-=======================================================================================================================================================================
+# Fast Elixir
 
 There is a wonderful project in Ruby called [fast-ruby](https://github.com/JuanitoFatas/fast-ruby), from which I got the inspiration for this repo. The idea is to collect various idioms for writing performant code when there is more than one _essentially_ symantically identical way of computing something. There may be slight differences, so please be sure that when you're changing something that it doesn't change the correctness of your program.
 
@@ -13,42 +12,15 @@ Machine information: MacBook Air (13-inch, Early 2014), 1.4 GHz Intel Core i5, 8
 
 **Let's write faster code, together! <3**
 
-Measurement Tool
------------------
+## Measurement Tool
 
-Use [benchee](https://github.com/PragTob/benchee) (0.7+).
+We use [benchee](https://github.com/PragTob/benchee) (0.7+).
 
-### Template
+## Contributing
 
-```elixir
-defmodule IdiomName.Fast do
-  def function_name do
-  end
-end
+Help us collect benchmarks! Please [read the contributing guide](CONTRIBUTING.md).
 
-defmodule IdiomName.Slow do
-  def function_name do
-  end
-end
-
-defmodule IdiomName.Benchmark do
-  def benchmark do
-    Benchee.run(%{
-      "Idiom Name Fast" => fn -> bench_func(IdiomName.Fast) end,
-      "Idiom Name Slow" => fn -> bench_func(IdiomName.Slow) end
-    }, time: 10, print: [fast_warning: false])
-  end
-
-  def bench_func(module) do
-    module.function_name
-  end
-end
-
-IdiomName.Benchmark.benchmark()
-```
-
-Idioms
-------
+## Idioms
 
 #### Map Lookup vs. Pattern Matching Lookup [code](code/general/map_lookup_vs_pattern_matching.exs)
 
@@ -118,7 +90,6 @@ Something look wrong to you? :cry: Have a better example? :heart_eyes: Excellent
 
 Thank you in advance! :wink: :beer:
 
-
 ## Also Checkout
 
 - [Benchmarking in Practice](https://www.youtube.com/watch?v=7-mE5CKXjkw)
@@ -130,13 +101,11 @@ Thank you in advance! :wink: :beer:
   Wonderful static analysis tool by [@rrrene](https://github.com/rrrene). It's not _just_ about speed, but it will flag some performance issues.
 
 
-
 Brought to you by [@devoncestes](https://twitter.com/devoncestes)
 
 ## License
 
 This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/).
-
 
 ## Code License
 
