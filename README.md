@@ -8,7 +8,7 @@ Each idiom has a corresponding code example that resides in [code](code).
 
 ## Measurement Tool
 
-We use [benchee](https://github.com/PragTob/benchee) (0.7+).
+We use [benchee](https://github.com/PragTob/benchee).
 
 ## Contributing
 
@@ -140,28 +140,33 @@ in the associative data structure. The speed differences are minimal.
 
 ```
 ↪ mix run code/general/sort_vs_sort_by.exs
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i7-4558U CPU @ 2.80GHz
+Number of Available Cores: 4
+Available memory: 17.179869184 GB
 Elixir 1.4.4
 Erlang 19.3
 Benchmark suite executing with the following configuration:
-warmup: 2.0s
-time: 10.0s
+warmup: 2.00 s
+time: 10.00 s
 parallel: 1
 inputs: none specified
-Estimated total run time: 36.0s
+Estimated total run time: 36.00 s
+
 
 Benchmarking sort/1...
 Benchmarking sort/2...
 Benchmarking sort_by/2...
 
 Name                ips        average  deviation         median
-sort/1           5.26 K      190.18 μs    ±17.11%      178.00 μs
-sort/2           5.02 K      199.39 μs    ±16.09%      187.00 μs
-sort_by/2        4.82 K      207.35 μs    ±19.17%      197.00 μs
+sort/1           5.20 K      192.27 μs    ±18.76%      182.00 μs
+sort/2           4.93 K      202.81 μs    ±24.58%      191.00 μs
+sort_by/2        4.81 K      207.88 μs    ±17.71%      198.00 μs
 
 Comparison:
-sort/1           5.26 K
-sort/2           5.02 K - 1.05x slower
-sort_by/2        4.82 K - 1.09x slower
+sort/1           5.20 K
+sort/2           4.93 K - 1.05x slower
+sort_by/2        4.81 K - 1.08x slower
 ```
 
 ## Something went wrong
