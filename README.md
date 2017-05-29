@@ -4,12 +4,6 @@ There is a wonderful project in Ruby called [fast-ruby](https://github.com/Juani
 
 Each idiom has a corresponding code example that resides in [code](code).
 
-All results listed in README.md are running with:
-* Elixir 1.4.2
-* Erlang/OTP 19 [erts-8.2.2] [source] [64-bit] [smp:4:4] [async-threads:10] [hipe] [kernel-poll:false] [dtrace].
-
-Machine information: MacBook Air (13-inch, Early 2014), 1.4 GHz Intel Core i5, 8 GB 1600 MHz DDR3, running MacOS Sierra 10.12.4. Your results may vary, but you get the idea. :)
-
 **Let's write faster code, together! <3**
 
 ## Measurement Tool
@@ -31,6 +25,10 @@ that behave like a key-value based data structure.
 
 ```
 $ mix run code/general/map_lookup_vs_pattern_matching.exs
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
+Number of Available Cores: 4
+Available memory: 8.589934592 GB
 Elixir 1.4.2
 Erlang 19.2.3
 Benchmark suite executing with the following configuration:
@@ -61,6 +59,10 @@ interpolation.
 
 ```
 $ mix run code/general/io_lists_vs_concatenation.exs
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
+Number of Available Cores: 4
+Available memory: 8.589934592 GB
 Elixir 1.4.2
 Erlang 19.2.3
 Benchmark suite executing with the following configuration:
@@ -80,6 +82,54 @@ Interpolation       18.92 K       52.84 μs   ±567.23%       36.00 μs
 Comparison:
 IO List             27.12 K
 Interpolation       18.92 K - 1.43x slower
+```
+
+#### Splitting Large Strings [code](code/general/string_split_large_strings.exs)
+
+Due to a known issue in Erlang, splitting very large strings can be done faster
+using Elixir's streaming approach rather than using `String.split/2`.
+
+```
+$ mix run code/general/map_lookup_vs_pattern_matching.exs
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
+Number of Available Cores: 4
+Available memory: 8.589934592 GB
+Elixir 1.4.2
+Erlang 19.2.3
+Benchmark suite executing with the following configuration:
+warmup: 2.00 s
+time: 10.00 s
+parallel: 1
+inputs: Large string (1 Million Numbers), Medium string (10 Thousand Numbers), Small string (1 Hundred Numbers)
+Estimated total run time: 1.20 min
+
+##### With input Large string (1 Million Numbers) #####
+Name                          ips        average  deviation         median
+splitter |> to_list          0.86         1.16 s    ±10.78%         1.12 s
+split                        0.22         4.61 s     ±0.68%         4.61 s
+
+Comparison:
+splitter |> to_list          0.86
+split                        0.22 - 3.98x slower
+
+##### With input Medium string (10 Thousand Numbers) #####
+Name                          ips        average  deviation         median
+split                      1.34 K        0.75 ms    ±37.86%        0.66 ms
+splitter |> to_list        0.24 K        4.15 ms    ±23.00%        3.90 ms
+
+Comparison:
+split                      1.34 K
+splitter |> to_list        0.24 K - 5.55x slower
+
+##### With input Small string (1 Hundred Numbers) #####
+Name                          ips        average  deviation         median
+split                    274.56 K        3.64 μs  ±1094.44%        3.00 μs
+splitter |> to_list       31.03 K       32.23 μs    ±71.77%       28.00 μs
+
+Comparison:
+split                    274.56 K
+splitter |> to_list       31.03 K - 8.85x slower
 ```
 
 ## Something went wrong
