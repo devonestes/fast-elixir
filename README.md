@@ -90,7 +90,7 @@ Due to a known issue in Erlang, splitting very large strings can be done faster
 using Elixir's streaming approach rather than using `String.split/2`.
 
 ```
-$ mix run code/general/map_lookup_vs_pattern_matching.exs
+$ mix run code/general/string_split_large_strings.exs
 Operating System: macOS
 CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
 Number of Available Cores: 4
