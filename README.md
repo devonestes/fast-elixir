@@ -84,6 +84,83 @@ IO List             27.12 K
 Interpolation       18.92 K - 1.43x slower
 ```
 
+#### Combining lists with `|` vs. `++` [code](code/general/concat_vs_cons.exs)
+
+Adding two lists together might seem like a simple problem to solve, but in
+Elixir there are a couple ways to solve that issue. We can use `++` to
+concatenate two lists easily: `[1, 2] ++ [3, 4] #=> [1, 2, 3, 4]`, but the
+problem with that approach is that once you start dealing with larger lists it
+becomes **VERY** slow! Because of this, when combining two lists, you should try
+and use the cons operator (`|`) whenever possible. This will require you to
+remember to flatten the resulting nested list, but it's a huge performance
+optimization on larger lists.
+
+```
+$ mix run code/general/concat_vs_cons.exs
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
+Number of Available Cores: 4
+Available memory: 8.589934592 GB
+Elixir 1.6.0-rc.0
+Erlang 20.1.1
+Benchmark suite executing with the following configuration:
+warmup: 2.00 s
+time: 10.00 s
+parallel: 1
+inputs: Large (30,000 items), Medium (3,000 items), Small (30 items)
+Estimated total run time: 1.80 min
+
+
+
+Benchmarking with input Large (30,000 items):
+Benchmarking Concatenation...
+Benchmarking Cons + Flatten...
+Benchmarking Cons + Reverse + Flatten...
+
+Benchmarking with input Medium (3,000 items):
+Benchmarking Concatenation...
+Benchmarking Cons + Flatten...
+Benchmarking Cons + Reverse + Flatten...
+
+Benchmarking with input Small (30 items):
+Benchmarking Concatenation...
+Benchmarking Cons + Flatten...
+Benchmarking Cons + Reverse + Flatten...
+
+##### With input Large (30,000 items) #####
+Name                               ips        average  deviation         median
+Cons + Flatten                  835.02        1.20 ms    ±24.72%        1.09 ms
+Cons + Reverse + Flatten        552.54        1.81 ms    ±93.13%        1.41 ms
+Concatenation                     1.01      991.80 ms     ±9.67%      942.94 ms
+
+Comparison:
+Cons + Flatten                  835.02
+Cons + Reverse + Flatten        552.54 - 1.51x slower
+Concatenation                     1.01 - 828.18x slower
+
+##### With input Medium (3,000 items) #####
+Name                               ips        average  deviation         median
+Cons + Flatten                  8.54 K      117.06 μs   ±127.61%       99.00 μs
+Cons + Reverse + Flatten        8.51 K      117.51 μs   ±157.46%      101.00 μs
+Concatenation                  0.121 K     8286.62 μs    ±21.36%     7957.00 μs
+
+Comparison:
+Cons + Flatten                  8.54 K
+Cons + Reverse + Flatten        8.51 K - 1.00x slower
+Concatenation                  0.121 K - 70.79x slower
+
+##### With input Small (30 items) #####
+Name                               ips        average  deviation         median
+Cons + Flatten                712.46 K        1.40 μs   ±518.46%        1.10 μs
+Cons + Reverse + Flatten      705.14 K        1.42 μs   ±385.13%        1.20 μs
+Concatenation                 701.87 K        1.42 μs  ±5519.46%        1.00 μs
+
+Comparison:
+Cons + Flatten                712.46 K
+Cons + Reverse + Flatten      705.14 K - 1.01x slower
+Concatenation                 701.87 K - 1.02x slower
+```
+
 #### Splitting Large Strings [code](code/general/string_split_large_strings.exs)
 
 Due to a known issue in Erlang, splitting very large strings can be done faster
