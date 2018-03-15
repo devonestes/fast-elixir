@@ -27,6 +27,6 @@ defmodule FastElixir.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:benchee, github: "PragTob/benchee"}]
+    [{:benchee, "~> 0.12"}]
   end
 end
