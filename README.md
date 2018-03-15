@@ -28,26 +28,27 @@ $ mix run code/general/map_lookup_vs_pattern_matching.exs
 Operating System: macOS
 CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
 Number of Available Cores: 4
-Available memory: 8.589934592 GB
-Elixir 1.4.2
-Erlang 19.2.3
+Available memory: 8 GB
+Elixir 1.6.3
+Erlang 20.3
 Benchmark suite executing with the following configuration:
-warmup: 2.0s
-time: 10.0s
+warmup: 2 s
+time: 10 s
 parallel: 1
 inputs: none specified
-Estimated total run time: 24.0s
+Estimated total run time: 24 s
+
 
 Benchmarking Map Lookup...
 Benchmarking Pattern Matching...
 
-Name                       ips        average  deviation         median
-Pattern Matching      726.52 K        1.38 μs   ±376.42%        1.20 μs
-Map Lookup            455.62 K        2.19 μs   ±185.63%        1.90 μs
+Name                       ips        average  deviation         median         99th %
+Pattern Matching      891.15 K        1.12 μs   ±458.04%           1 μs           2 μs
+Map Lookup            671.59 K        1.49 μs   ±385.22%        1.40 μs           3 μs
 
 Comparison:
-Pattern Matching      726.52 K
-Map Lookup            455.62 K - 1.59x slower
+Pattern Matching      891.15 K
+Map Lookup            671.59 K - 1.33x slower
 ```
 
 #### IO Lists vs. String Concatenation [code](code/general/io_lists_vs_concatenation.exs)
@@ -62,26 +63,28 @@ $ mix run code/general/io_lists_vs_concatenation.exs
 Operating System: macOS
 CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
 Number of Available Cores: 4
-Available memory: 8.589934592 GB
-Elixir 1.4.2
-Erlang 19.2.3
+Available memory: 8 GB
+Elixir 1.6.3
+Erlang 20.3
 Benchmark suite executing with the following configuration:
-warmup: 2.0s
-time: 10.0s
+warmup: 2 s
+time: 10 s
 parallel: 1
 inputs: none specified
-Estimated total run time: 24.0s
+Estimated total run time: 24 s
+
 
 Benchmarking IO List...
 Benchmarking Interpolation...
 
-Name                    ips        average  deviation         median
-IO List             27.12 K       36.87 μs   ±345.26%       33.00 μs
-Interpolation       18.92 K       52.84 μs   ±567.23%       36.00 μs
+
+Name                    ips        average  deviation         median         99th %
+IO List             17.85 K       56.03 μs   ±472.47%          44 μs         132 μs
+Interpolation       16.25 K       61.53 μs   ±436.51%          47 μs         149 μs
 
 Comparison:
-IO List             27.12 K
-Interpolation       18.92 K - 1.43x slower
+IO List             17.85 K
+Interpolation       16.25 K - 1.10x slower
 ```
 
 #### Combining lists with `|` vs. `++` [code](code/general/concat_vs_cons.exs)
@@ -100,65 +103,59 @@ $ mix run code/general/concat_vs_cons.exs
 Operating System: macOS
 CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
 Number of Available Cores: 4
-Available memory: 8.589934592 GB
-Elixir 1.6.0-rc.0
-Erlang 20.1.1
+Available memory: 8 GB
+Elixir 1.6.3
+Erlang 20.3
 Benchmark suite executing with the following configuration:
-warmup: 2.00 s
-time: 10.00 s
+warmup: 2 s
+time: 10 s
 parallel: 1
 inputs: Large (30,000 items), Medium (3,000 items), Small (30 items)
 Estimated total run time: 1.80 min
 
 
-
-Benchmarking with input Large (30,000 items):
-Benchmarking Concatenation...
-Benchmarking Cons + Flatten...
-Benchmarking Cons + Reverse + Flatten...
-
-Benchmarking with input Medium (3,000 items):
-Benchmarking Concatenation...
-Benchmarking Cons + Flatten...
-Benchmarking Cons + Reverse + Flatten...
-
-Benchmarking with input Small (30 items):
-Benchmarking Concatenation...
-Benchmarking Cons + Flatten...
-Benchmarking Cons + Reverse + Flatten...
+Benchmarking Concatenation with input Large (30,000 items)...
+Benchmarking Concatenation with input Medium (3,000 items)...
+Benchmarking Concatenation with input Small (30 items)...
+Benchmarking Cons + Flatten with input Large (30,000 items)...
+Benchmarking Cons + Flatten with input Medium (3,000 items)...
+Benchmarking Cons + Flatten with input Small (30 items)...
+Benchmarking Cons + Reverse + Flatten with input Large (30,000 items)...
+Benchmarking Cons + Reverse + Flatten with input Medium (3,000 items)...
+Benchmarking Cons + Reverse + Flatten with input Small (30 items)...
 
 ##### With input Large (30,000 items) #####
-Name                               ips        average  deviation         median
-Cons + Flatten                  835.02        1.20 ms    ±24.72%        1.09 ms
-Cons + Reverse + Flatten        552.54        1.81 ms    ±93.13%        1.41 ms
-Concatenation                     1.01      991.80 ms     ±9.67%      942.94 ms
+Name                               ips        average  deviation         median         99th %
+Cons + Flatten                 1050.17        0.95 ms    ±21.56%        0.91 ms        1.76 ms
+Cons + Reverse + Flatten        963.62        1.04 ms    ±20.34%        0.95 ms        1.88 ms
+Concatenation                     1.15      873.22 ms     ±7.07%      849.37 ms     1057.06 ms
 
 Comparison:
-Cons + Flatten                  835.02
-Cons + Reverse + Flatten        552.54 - 1.51x slower
-Concatenation                     1.01 - 828.18x slower
+Cons + Flatten                 1050.17
+Cons + Reverse + Flatten        963.62 - 1.09x slower
+Concatenation                     1.15 - 917.03x slower
 
 ##### With input Medium (3,000 items) #####
-Name                               ips        average  deviation         median
-Cons + Flatten                  8.54 K      117.06 μs   ±127.61%       99.00 μs
-Cons + Reverse + Flatten        8.51 K      117.51 μs   ±157.46%      101.00 μs
-Concatenation                  0.121 K     8286.62 μs    ±21.36%     7957.00 μs
+Name                               ips        average  deviation         median         99th %
+Cons + Flatten                 11.43 K       87.45 μs    ±23.38%          79 μs      166.32 μs
+Cons + Reverse + Flatten       10.88 K       91.93 μs    ±83.54%          82 μs         185 μs
+Concatenation                  0.138 K     7263.24 μs    ±14.32%        6884 μs    11724.06 μs
 
 Comparison:
-Cons + Flatten                  8.54 K
-Cons + Reverse + Flatten        8.51 K - 1.00x slower
-Concatenation                  0.121 K - 70.79x slower
+Cons + Flatten                 11.43 K
+Cons + Reverse + Flatten       10.88 K - 1.05x slower
+Concatenation                  0.138 K - 83.05x slower
 
 ##### With input Small (30 items) #####
-Name                               ips        average  deviation         median
-Cons + Flatten                712.46 K        1.40 μs   ±518.46%        1.10 μs
-Cons + Reverse + Flatten      705.14 K        1.42 μs   ±385.13%        1.20 μs
-Concatenation                 701.87 K        1.42 μs  ±5519.46%        1.00 μs
+Name                               ips        average  deviation         median         99th %
+Cons + Reverse + Flatten      891.07 K        1.12 μs   ±336.67%           1 μs           2 μs
+Cons + Flatten                890.95 K        1.12 μs   ±473.42%           1 μs        2.10 μs
+Concatenation                 717.19 K        1.39 μs  ±6508.63%           1 μs           2 μs
 
 Comparison:
-Cons + Flatten                712.46 K
-Cons + Reverse + Flatten      705.14 K - 1.01x slower
-Concatenation                 701.87 K - 1.02x slower
+Cons + Reverse + Flatten      891.07 K
+Cons + Flatten                890.95 K - 1.00x slower
+Concatenation                 717.19 K - 1.24x slower
 ```
 
 #### Splitting Large Strings [code](code/general/string_split_large_strings.exs)
@@ -171,79 +168,87 @@ $ mix run code/general/string_split_large_strings.exs
 Operating System: macOS
 CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
 Number of Available Cores: 4
-Available memory: 8.589934592 GB
-Elixir 1.4.2
-Erlang 19.2.3
+Available memory: 8 GB
+Elixir 1.6.3
+Erlang 20.3
 Benchmark suite executing with the following configuration:
-warmup: 2.00 s
-time: 10.00 s
+warmup: 2 s
+time: 10 s
 parallel: 1
 inputs: Large string (1 Million Numbers), Medium string (10 Thousand Numbers), Small string (1 Hundred Numbers)
 Estimated total run time: 1.20 min
 
+
+Benchmarking split with input Large string (1 Million Numbers)...
+Benchmarking split with input Medium string (10 Thousand Numbers)...
+Benchmarking split with input Small string (1 Hundred Numbers)...
+Benchmarking splitter |> to_list with input Large string (1 Million Numbers)...
+Benchmarking splitter |> to_list with input Medium string (10 Thousand Numbers)...
+Benchmarking splitter |> to_list with input Small string (1 Hundred Numbers)...
+
 ##### With input Large string (1 Million Numbers) #####
-Name                          ips        average  deviation         median
-splitter |> to_list          0.86         1.16 s    ±10.78%         1.12 s
-split                        0.22         4.61 s     ±0.68%         4.61 s
+Name                          ips        average  deviation         median         99th %
+splitter |> to_list          2.81         0.36 s    ±17.24%         0.34 s         0.52 s
+split                        0.29         3.48 s     ±0.24%         3.49 s         3.49 s
 
 Comparison:
-splitter |> to_list          0.86
-split                        0.22 - 3.98x slower
+splitter |> to_list          2.81
+split                        0.29 - 9.78x slower
 
 ##### With input Medium string (10 Thousand Numbers) #####
-Name                          ips        average  deviation         median
-split                      1.34 K        0.75 ms    ±37.86%        0.66 ms
-splitter |> to_list        0.24 K        4.15 ms    ±23.00%        3.90 ms
+Name                          ips        average  deviation         median         99th %
+split                      1.73 K        0.58 ms    ±34.42%        0.71 ms        0.86 ms
+splitter |> to_list        0.33 K        3.04 ms    ±18.95%        3.11 ms        4.76 ms
 
 Comparison:
-split                      1.34 K
-splitter |> to_list        0.24 K - 5.55x slower
+split                      1.73 K
+splitter |> to_list        0.33 K - 5.25x slower
 
 ##### With input Small string (1 Hundred Numbers) #####
-Name                          ips        average  deviation         median
-split                    274.56 K        3.64 μs  ±1094.44%        3.00 μs
-splitter |> to_list       31.03 K       32.23 μs    ±71.77%       28.00 μs
+Name                          ips        average  deviation         median         99th %
+split                    302.83 K        3.30 μs  ±1848.10%           3 μs           6 μs
+splitter |> to_list       48.08 K       20.80 μs   ±215.29%          18 μs          82 μs
 
 Comparison:
-split                    274.56 K
-splitter |> to_list       31.03 K - 8.85x slower
+split                    302.83 K
+splitter |> to_list       48.08 K - 6.30x slower
 ```
 
 #### `sort` vs. `sort_by` [code](code/general/sort_vs_sort_by.exs)
 
-Sorting a list of maps or keyword lists can be done in various ways,
-given that the key-value you want to sort on is the first one defined
-in the associative data structure. The speed differences are minimal.
+Sorting a list of maps or keyword lists can be done in various ways, given that
+the key-value you want to sort on is the first one defined in the associative
+data structure. The speed differences are minimal.
 
 ```
-↪ mix run code/general/sort_vs_sort_by.exs
+$ mix run code/general/sort_vs_sort_by.exs
 Operating System: macOS
-CPU Information: Intel(R) Core(TM) i7-4558U CPU @ 2.80GHz
+CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
 Number of Available Cores: 4
-Available memory: 17.179869184 GB
-Elixir 1.4.4
-Erlang 19.3
+Available memory: 8 GB
+Elixir 1.6.3
+Erlang 20.3
 Benchmark suite executing with the following configuration:
-warmup: 2.00 s
-time: 10.00 s
+warmup: 2 s
+time: 10 s
 parallel: 1
 inputs: none specified
-Estimated total run time: 36.00 s
+Estimated total run time: 36 s
 
 
 Benchmarking sort/1...
 Benchmarking sort/2...
 Benchmarking sort_by/2...
 
-Name                ips        average  deviation         median
-sort/1           5.20 K      192.27 μs    ±18.76%      182.00 μs
-sort/2           4.93 K      202.81 μs    ±24.58%      191.00 μs
-sort_by/2        4.81 K      207.88 μs    ±17.71%      198.00 μs
+Name                ips        average  deviation         median         99th %
+sort/1           4.93 K      202.65 μs    ±21.42%         191 μs         409 μs
+sort/2           4.74 K      210.76 μs    ±18.83%         199 μs         394 μs
+sort_by/2        4.53 K      220.71 μs    ±34.84%         204 μs         438 μs
 
 Comparison:
-sort/1           5.20 K
-sort/2           4.93 K - 1.05x slower
-sort_by/2        4.81 K - 1.08x slower
+sort/1           4.93 K
+sort/2           4.74 K - 1.04x slower
+sort_by/2        4.53 K - 1.09x slower
 ```
 
 #### Retrieving state from ets tables vs. Gen Servers [code](code/general/ets_vs_gen_server.exs)
@@ -251,35 +256,36 @@ sort_by/2        4.81 K - 1.08x slower
 There are many differences between Gen Servers and ets tables, but many people
 have often praised ets tables for being extremely fast. For the simple case of
 retrieving information from a key-value store, the ets table is indeed much
-faster for lookups. For more complicated use cases, and for comparisons of
-writes instead of reads, further benchmarks are needed, but so far ets lives up
-to its reputation for speed.
+faster for reads. For more complicated use cases, and for comparisons of writes
+instead of reads, further benchmarks are needed, but so far ets lives up to its
+reputation for speed.
 
 ```
+$ mix run code/general/ets_vs_gen_server.exs
 Operating System: macOS
 CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
 Number of Available Cores: 4
-Available memory: 8.589934592 GB
-Elixir 1.7.0-dev
-Erlang 20.2
+Available memory: 8 GB
+Elixir 1.6.3
+Erlang 20.3
 Benchmark suite executing with the following configuration:
-warmup: 2.00 s
-time: 10.00 s
+warmup: 2 s
+time: 10 s
 parallel: 1
 inputs: none specified
-Estimated total run time: 24.00 s
+Estimated total run time: 24 s
 
 
 Benchmarking ets table...
 Benchmarking gen server...
 
-Name                 ips        average  deviation         median
-ets table         9.18 M       0.109 μs   ±555.09%       0.100 μs
-gen server        0.34 M        2.97 μs  ±1954.50%        3.00 μs
+Name                 ips        average  deviation         median         99th %
+ets table         9.12 M       0.110 μs   ±365.39%       0.100 μs        0.23 μs
+gen server        0.29 M        3.46 μs  ±2532.35%           3 μs          10 μs
 
 Comparison:
-ets table         9.18 M
-gen server        0.34 M - 27.24x slower
+ets table         9.12 M
+gen server        0.29 M - 31.53x slower
 ```
 
 ## Something went wrong
