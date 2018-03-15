@@ -246,6 +246,42 @@ sort/2           4.93 K - 1.05x slower
 sort_by/2        4.81 K - 1.08x slower
 ```
 
+#### Retrieving state from ets tables vs. Gen Servers [code](code/general/ets_vs_gen_server.exs)
+
+There are many differences between Gen Servers and ets tables, but many people
+have often praised ets tables for being extremely fast. For the simple case of
+retrieving information from a key-value store, the ets table is indeed much
+faster for lookups. For more complicated use cases, and for comparisons of
+writes instead of reads, further benchmarks are needed, but so far ets lives up
+to its reputation for speed.
+
+```
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
+Number of Available Cores: 4
+Available memory: 8.589934592 GB
+Elixir 1.7.0-dev
+Erlang 20.2
+Benchmark suite executing with the following configuration:
+warmup: 2.00 s
+time: 10.00 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 24.00 s
+
+
+Benchmarking ets table...
+Benchmarking gen server...
+
+Name                 ips        average  deviation         median
+ets table         9.18 M       0.109 μs   ±555.09%       0.100 μs
+gen server        0.34 M        2.97 μs  ±1954.50%        3.00 μs
+
+Comparison:
+ets table         9.18 M
+gen server        0.34 M - 27.24x slower
+```
+
 ## Something went wrong
 
 Something look wrong to you? :cry: Have a better example? :heart_eyes: Excellent!
