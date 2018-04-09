@@ -288,6 +288,74 @@ ets table         9.12 M
 gen server        0.29 M - 31.53x slower
 ```
 
+#### Comparing strings vs. atoms [code](code/general/comparing_strings_vs_atoms.exs)
+
+Because atoms are stored in a special table in the BEAM, comparing atoms is
+rather fast compared to comparing strings, where you need to compare each part
+of the list that underlies the string. When you have a choice of what type to
+use, atoms is the faster choice. However, what you probably should not do is
+to convert strings to atoms solely for the perceived speed benefit, since it
+ends up being much slower than just comparing the strings, even dozens of times.
+
+```
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
+Number of Available Cores: 4
+Available memory: 8 GB
+Elixir 1.6.3
+Erlang 20.3
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 10 s
+parallel: 1
+inputs: Large (1-100), Medium (1-50), Small (1-5)
+Estimated total run time: 1.80 min
+
+
+Benchmarking Comparing atoms with input Large (1-100)...
+Benchmarking Comparing atoms with input Medium (1-50)...
+Benchmarking Comparing atoms with input Small (1-5)...
+Benchmarking Comparing strings with input Large (1-100)...
+Benchmarking Comparing strings with input Medium (1-50)...
+Benchmarking Comparing strings with input Small (1-5)...
+Benchmarking Converting to atoms and then comparing with input Large (1-100)...
+Benchmarking Converting to atoms and then comparing with input Medium (1-50)...
+Benchmarking Converting to atoms and then comparing with input Small (1-5)...
+
+##### With input Large (1-100) #####
+Name                                             ips        average  deviation         median         99th %
+Comparing atoms                               8.12 M       0.123 μs    ±54.10%       0.120 μs        0.22 μs
+Comparing strings                             6.94 M       0.144 μs    ±75.54%       0.140 μs        0.25 μs
+Converting to atoms and then comparing        0.68 M        1.47 μs   ±350.78%           1 μs           2 μs
+
+Comparison:
+Comparing atoms                               8.12 M
+Comparing strings                             6.94 M - 1.17x slower
+Converting to atoms and then comparing        0.68 M - 11.95x slower
+
+##### With input Medium (1-50) #####
+Name                                             ips        average  deviation         median         99th %
+Comparing atoms                               8.05 M       0.124 μs    ±86.21%       0.120 μs        0.23 μs
+Comparing strings                             6.91 M       0.145 μs    ±76.74%       0.140 μs        0.25 μs
+Converting to atoms and then comparing        1.00 M        1.00 μs   ±441.77%           1 μs           2 μs
+
+Comparison:
+Comparing atoms                               8.05 M
+Comparing strings                             6.91 M - 1.17x slower
+Converting to atoms and then comparing        1.00 M - 8.08x slower
+
+##### With input Small (1-5) #####
+Name                                             ips        average  deviation         median         99th %
+Comparing atoms                               7.99 M       0.125 μs    ±85.13%       0.120 μs        0.22 μs
+Comparing strings                             6.83 M       0.146 μs    ±78.46%       0.140 μs        0.25 μs
+Converting to atoms and then comparing        2.64 M        0.38 μs    ±51.12%        0.37 μs        0.59 μs
+
+Comparison:
+Comparing atoms                               7.99 M
+Comparing strings                             6.83 M - 1.17x slower
+Converting to atoms and then comparing        2.64 M - 3.03x slower
+```
+
 ## Something went wrong
 
 Something look wrong to you? :cry: Have a better example? :heart_eyes: Excellent!
