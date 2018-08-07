@@ -356,6 +356,53 @@ Comparing strings                             6.83 M - 1.17x slower
 Converting to atoms and then comparing        2.64 M - 3.03x slower
 ```
 
+### spawn vs. spawn_link [code](code/general/spawn_vs_spawn_link.exs) 
+
+There are two ways to spawn a process on the BEAM, `spawn` and `spawn_link`.
+Because `spawn_link` links the child process to the process which spawned it, it
+takes slightly longer. The way in which processes are spawned is unlikely to be
+a bottleneck in most applications, though, and the resiliency benefits of OTP
+supervision trees vastly outweighs the slightly slower run time of `spawn_link`,
+so that should still be favored in nearly every case in which processes need to
+be spawned.
+
+```
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
+Number of Available Cores: 4
+Available memory: 8 GB
+Elixir 1.7.1
+Erlang 21.0
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 10 s
+memory time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 28 s
+
+
+Benchmarking spawn/1...
+Benchmarking spawn_link/1...
+
+Name                   ips        average  deviation         median         99th %
+spawn/1           507.24 K        1.97 μs  ±1950.75%           2 μs           3 μs
+spawn_link/1      436.03 K        2.29 μs  ±1224.66%           2 μs           4 μs
+
+Comparison:
+spawn/1           507.24 K
+spawn_link/1      436.03 K - 1.16x slower
+
+Memory usage statistics:
+
+Name            Memory usage
+spawn/1                144 B
+spawn_link/1           144 B - 1.00x memory usage
+
+**All measurements for memory usage were the same**
+```
+
 ## Something went wrong
 
 Something look wrong to you? :cry: Have a better example? :heart_eyes: Excellent!
