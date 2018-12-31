@@ -16,6 +16,15 @@ Help us collect benchmarks! Please [read the contributing guide](CONTRIBUTING.md
 
 ## Idioms
 
+- [Map Lookup vs. Pattern Matching Lookup](#map-lookup-vs-pattern-matching-lookup-code)
+- [IO Lists vs. String Concatenation](#io-lists-vs-string-concatenation-code)
+- [Combining lists with `|` vs. `++`](#combining-lists-with--vs--code)
+- [Splitting Large Strings](#splitting-large-strings-code)
+- [`sort` vs. `sort_by`](#sort-vs-sort_by-code)
+- [Retrieving state from ets tables vs. Gen Servers](#retrieving-state-from-ets-tables-vs-gen-servers-code)
+- [Comparing strings vs. atoms](#comparing-strings-vs-atoms-code)
+- [spawn vs. spawn_link](#spawn-vs-spawn_link-code)
+
 #### Map Lookup vs. Pattern Matching Lookup [code](code/general/map_lookup_vs_pattern_matching.exs)
 
 If you need to lookup static values in a key-value based structure, you might at
