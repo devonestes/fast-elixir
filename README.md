@@ -25,7 +25,7 @@ Help us collect benchmarks! Please [read the contributing guide](CONTRIBUTING.md
 - [Retrieving state from ets tables vs. Gen Servers](#retrieving-state-from-ets-tables-vs-gen-servers-code)
 - [Comparing strings vs. atoms](#comparing-strings-vs-atoms-code)
 - [spawn vs. spawn_link](#spawn-vs-spawn_link-code)
-- [Replacements for Enum.filter_map/3](#spawn-vs-spawn_link-code)
+- [Replacements for Enum.filter_map/3](#replacements-for-enumfilter_map3-code)
 
 #### Map Lookup vs. Pattern Matching Lookup [code](code/general/map_lookup_vs_pattern_matching.exs)
 
@@ -167,6 +167,71 @@ Comparison:
 Cons + Reverse + Flatten      891.07 K
 Cons + Flatten                890.95 K - 1.00x slower
 Concatenation                 717.19 K - 1.24x slower
+```
+
+#### Putting into maps with `Map.put` and `put_in` [code](code/general/map_put_vs_put_in.exs)
+
+Do not put data into root of map with `put_in`. It is ~2x slower than `Map.put`. Also `put_in/2` is more effective than `put_in/3`.
+
+```
+Operating System: macOS"
+CPU Information: Intel(R) Core(TM) i7-3520M CPU @ 2.90GHz
+Number of Available Cores: 4
+Available memory: 8 GB
+Elixir 1.7.4
+Erlang 21.2.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 10 s
+memory time: 0 μs
+parallel: 1
+inputs: Large (30,000 items), Medium (3,000 items), Small (30 items)
+Estimated total run time: 1.80 min
+
+
+Benchmarking Map.put/3 with input Large (30,000 items)...
+Benchmarking Map.put/3 with input Medium (3,000 items)...
+Benchmarking Map.put/3 with input Small (30 items)...
+Benchmarking put_in/2 with input Large (30,000 items)...
+Benchmarking put_in/2 with input Medium (3,000 items)...
+Benchmarking put_in/2 with input Small (30 items)...
+Benchmarking put_in/3 with input Large (30,000 items)...
+Benchmarking put_in/3 with input Medium (3,000 items)...
+Benchmarking put_in/3 with input Small (30 items)...
+
+##### With input Large (30,000 items) #####
+Name                ips        average  deviation         median         99th %
+Map.put/3        265.12        3.77 ms    ±47.11%        3.33 ms       11.35 ms
+put_in/2         186.31        5.37 ms    ±21.17%        5.15 ms        8.67 ms
+put_in/3         158.40        6.31 ms    ±34.23%        5.84 ms       14.71 ms
+
+Comparison:
+Map.put/3        265.12
+put_in/2         186.31 - 1.42x slower
+put_in/3         158.40 - 1.67x slower
+
+##### With input Medium (3,000 items) #####
+Name                ips        average  deviation         median         99th %
+Map.put/3        5.68 K      175.93 μs   ±143.04%         151 μs         476 μs
+put_in/2         2.73 K      366.60 μs    ±34.11%         334 μs         829 μs
+put_in/3         2.44 K      409.76 μs    ±30.36%         372 μs      854.51 μs
+
+Comparison:
+Map.put/3        5.68 K
+put_in/2         2.73 K - 2.08x slower
+put_in/3         2.44 K - 2.33x slower
+
+##### With input Small (30 items) #####
+Name                ips        average  deviation         median         99th %
+Map.put/3      677.44 K        1.48 μs  ±2879.99%           1 μs           3 μs
+put_in/2       362.48 K        2.76 μs  ±1833.30%           2 μs           5 μs
+put_in/3       337.47 K        2.96 μs  ±1141.45%           3 μs           5 μs
+
+Comparison:
+Map.put/3      677.44 K
+put_in/2       362.48 K - 1.87x slower
+put_in/3       337.47 K - 2.01x slower
 ```
 
 #### Splitting Large Strings [code](code/general/string_split_large_strings.exs)
@@ -414,7 +479,7 @@ spawn_link/1           144 B - 1.00x memory usage
 **All measurements for memory usage were the same**
 ```
 
-#### Replacements for Enum.filter_map/3 [code](code/general/filter_map.exs) 
+#### Replacements for Enum.filter_map/3 [code](code/general/filter_map.exs)
 
 Elixir used to have an `Enum.filter_map/3` function that would filter a list and
 also apply a function to each element in the list that was not removed, but it
