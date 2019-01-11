@@ -19,7 +19,7 @@ Help us collect benchmarks! Please [read the contributing guide](CONTRIBUTING.md
 - [Map Lookup vs. Pattern Matching Lookup](#map-lookup-vs-pattern-matching-lookup-code)
 - [IO Lists vs. String Concatenation](#io-lists-vs-string-concatenation-code)
 - [Combining lists with `|` vs. `++`](#combining-lists-with--vs--code)
-- [Putting into maps with `Map.put` and `put_in`](#putting-into-maps-with-mapput-and-putin-code)
+- [Putting into maps with `Map.put` and `put_in`](#putting-into-maps-with-mapput-and-put_in-code)
 - [Splitting Large Strings](#splitting-large-strings-code)
 - [`sort` vs. `sort_by`](#sort-vs-sort_by-code)
 - [Retrieving state from ets tables vs. Gen Servers](#retrieving-state-from-ets-tables-vs-gen-servers-code)
