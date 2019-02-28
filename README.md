@@ -16,6 +16,17 @@ Help us collect benchmarks! Please [read the contributing guide](CONTRIBUTING.md
 
 ## Idioms
 
+- [Map Lookup vs. Pattern Matching Lookup](#map-lookup-vs-pattern-matching-lookup-code)
+- [IO Lists vs. String Concatenation](#io-lists-vs-string-concatenation-code)
+- [Combining lists with `|` vs. `++`](#combining-lists-with--vs--code)
+- [Putting into maps with `Map.put` and `put_in`](#putting-into-maps-with-mapput-and-put_in-code)
+- [Splitting Large Strings](#splitting-large-strings-code)
+- [`sort` vs. `sort_by`](#sort-vs-sort_by-code)
+- [Retrieving state from ets tables vs. Gen Servers](#retrieving-state-from-ets-tables-vs-gen-servers-code)
+- [Comparing strings vs. atoms](#comparing-strings-vs-atoms-code)
+- [spawn vs. spawn_link](#spawn-vs-spawn_link-code)
+- [Replacements for Enum.filter_map/3](#spawn-vs-spawn_link-code)
+
 #### Map Lookup vs. Pattern Matching Lookup [code](code/general/map_lookup_vs_pattern_matching.exs)
 
 If you need to lookup static values in a key-value based structure, you might at
@@ -399,6 +410,120 @@ Memory usage statistics:
 Name            Memory usage
 spawn/1                144 B
 spawn_link/1           144 B - 1.00x memory usage
+
+**All measurements for memory usage were the same**
+```
+
+#### Replacements for Enum.filter_map/3 [code](code/general/filter_map.exs) 
+
+Elixir used to have an `Enum.filter_map/3` function that would filter a list and
+also apply a function to each element in the list that was not removed, but it
+was deprecated in version 1.5. Luckily there are still four other ways to do
+that same thing! They're all mostly the same, but if you're looking for the
+options with the best performance your best bet is to use either a `for`
+comprehension or `Enum.reduce/3` and then `Enum.reverse/1`. Using
+`Enum.filter/2` and then `Enum.map/2` is also a fine choice, but it has higher
+memory usage than the other two options.
+
+The one option you should avoid is using `Enum.flat_map/2` as it is both slower
+and has higher memory usage.
+
+```
+Operating System: Linux
+CPU Information: Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz
+Number of Available Cores: 8
+Available memory: 15.39 GB
+Elixir 1.8.1
+Erlang 21.2.6
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 10 s
+memory time: 10 ms
+parallel: 1
+inputs: Large, Medium, Small
+Estimated total run time: 2.40 min
+
+
+Benchmarking filter |> map with input Large...
+Benchmarking filter |> map with input Medium...
+Benchmarking filter |> map with input Small...
+Benchmarking flat_map with input Large...
+Benchmarking flat_map with input Medium...
+Benchmarking flat_map with input Small...
+Benchmarking for comprehension with input Large...
+Benchmarking for comprehension with input Medium...
+Benchmarking for comprehension with input Small...
+Benchmarking reduce |> reverse with input Large...
+Benchmarking reduce |> reverse with input Medium...
+Benchmarking reduce |> reverse with input Small...
+
+##### With input Small #####
+Name                        ips        average  deviation         median         99th %
+reduce |> reverse      167.19 K        5.98 μs   ±308.23%        5.18 μs       12.07 μs
+filter |> map          163.15 K        6.13 μs   ±296.65%        5.16 μs       11.98 μs
+for comprehension      157.76 K        6.34 μs   ±269.05%        5.39 μs       12.38 μs
+flat_map               116.20 K        8.61 μs   ±192.50%        7.69 μs       16.06 μs
+
+Comparison: 
+reduce |> reverse      167.19 K
+filter |> map          163.15 K - 1.02x slower
+for comprehension      157.76 K - 1.06x slower
+flat_map               116.20 K - 1.44x slower
+
+Memory usage statistics:
+
+Name                 Memory usage
+reduce |> reverse         1.19 KB
+filter |> map             1.70 KB - 1.43x memory usage
+for comprehension         1.19 KB - 1.00x memory usage
+flat_map                  1.59 KB - 1.34x memory usage
+
+**All measurements for memory usage were the same**
+
+##### With input Medium #####
+Name                        ips        average  deviation         median         99th %
+reduce |> reverse        1.76 K      569.19 μs    ±17.54%      532.00 μs     1035.91 μs
+for comprehension        1.73 K      579.06 μs    ±14.77%      548.57 μs      938.81 μs
+filter |> map            1.72 K      582.49 μs    ±19.98%      536.60 μs     1069.09 μs
+flat_map                 1.21 K      824.01 μs    ±18.25%      765.08 μs     1535.27 μs
+
+Comparison: 
+reduce |> reverse        1.76 K
+for comprehension        1.73 K - 1.02x slower
+filter |> map            1.72 K - 1.02x slower
+flat_map                 1.21 K - 1.45x slower
+
+Memory usage statistics:
+
+Name                 Memory usage
+reduce |> reverse        57.13 KB
+for comprehension        57.13 KB - 1.00x memory usage
+filter |> map           109.15 KB - 1.91x memory usage
+flat_map                117.48 KB - 2.06x memory usage
+
+**All measurements for memory usage were the same**
+
+##### With input Large #####
+Name                        ips        average  deviation         median         99th %
+for comprehension         16.48       60.68 ms    ±11.70%       58.62 ms       91.09 ms
+filter |> map             16.35       61.15 ms    ±12.88%       59.24 ms       89.90 ms
+reduce |> reverse         16.20       61.72 ms    ±14.36%       57.73 ms       83.17 ms
+flat_map                  11.71       85.43 ms    ±13.90%       78.94 ms      113.50 ms
+
+Comparison: 
+for comprehension         16.48
+filter |> map             16.35 - 1.01x slower
+reduce |> reverse         16.20 - 1.02x slower
+flat_map                  11.71 - 1.41x slower
+
+Memory usage statistics:
+
+Name                 Memory usage
+for comprehension         8.16 MB
+filter |> map            13.34 MB - 1.63x memory usage
+reduce |> reverse         8.16 MB - 1.00x memory usage
+flat_map                 13.64 MB - 1.67x memory usage
 
 **All measurements for memory usage were the same**
 ```
