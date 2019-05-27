@@ -12,13 +12,6 @@ defmodule FastElixir.Mixfile do
     ]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type "mix help compile.app" for more information
-  def application do
-    [applications: [:logger]]
-  end
-
   # Type "mix help deps" for more information
   defp deps do
     [{:benchee, "~> 1.0"}]
