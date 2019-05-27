@@ -36,13 +36,9 @@ end
 
 defmodule Membership.Benchmark do
   @inputs %{
-    "Large (pass)" => {1..1_000_000, Enum.shuffle(1..1_000_000), MapSet.new(1..1_000_000)},
-    "Large (fail)" =>
-      {1_000_001..2_000_000, Enum.shuffle(1..1_000_000), MapSet.new(1..1_000_000)},
-    "Medium (pass)" => {1..10_000, Enum.shuffle(1..10_000), MapSet.new(1..10_000)},
-    "Medium (fail)" => {10_001..20_000, Enum.shuffle(1..10_000), MapSet.new(1..10_000)},
-    "Small (pass)" => {1..100, Enum.shuffle(1..100), MapSet.new(1..100)},
-    "Small (fail)" => {101..200, Enum.shuffle(1..100), MapSet.new(1..100)}
+    "Large" => {1..1_000_000, Enum.shuffle(1..1_000_000), MapSet.new(1..1_000_000)},
+    "Medium" => {1..10_000, Enum.shuffle(1..10_000), MapSet.new(1..10_000)},
+    "Small" => {1..100, Enum.shuffle(1..100), MapSet.new(1..100)}
   }
 
   def benchmark do
