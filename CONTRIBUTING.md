@@ -6,9 +6,11 @@ Thank you for contributing! Let's get you started!
 
 1. Fork and clone the repository
 
-2. Install dependencies: `mix deps.get`
+1. Install the Elixir/Erlang versions in [`.tool-versions`](.tool-versions)
 
-3. Write a benchmark using the following template:
+1. Install dependencies: `mix deps.get`
+
+1. Write a benchmark using the following template:
 
     ```elixir
     defmodule IdiomName.Fast do
@@ -37,8 +39,8 @@ Thank you for contributing! Let's get you started!
     IdiomName.Benchmark.benchmark()
     ```
 
-4. Run your benchmark: `mix run code/<category>/<benchmark>.exs`
+1. Run your benchmark: `mix run code/<category>/<benchmark>.exs`
 
-5. Add the output along with a description to the [README](README.md).
+1. Add the output along with a description to the [README](README.md)
 
-6. Open a Pull Request!
+1. Open a Pull Request!
