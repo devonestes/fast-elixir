@@ -595,7 +595,8 @@ flat_map                 13.64 MB - 1.67x memory usage
 
 #### String.slice/3 vs :binary.part/3 [code](code/general/string_slice.exs)
 
-What is the fastest way to extract a substring?
+From `String.slice/3` [documentation](https://hexdocs.pm/elixir/String.html#slice/3):
+Remember this function works with Unicode graphemes and considers the slices to represent grapheme offsets. If you want to split on raw bytes, check `Kernel.binary_part/3` instead.
 
 ```
 Operating System: macOS
