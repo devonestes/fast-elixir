@@ -432,7 +432,7 @@ Comparing strings                             6.83 M - 1.17x slower
 Converting to atoms and then comparing        2.64 M - 3.03x slower
 ```
 
-### spawn vs. spawn_link [code](code/general/spawn_vs_spawn_link.exs) 
+### spawn vs. spawn_link [code](code/general/spawn_vs_spawn_link.exs)
 
 There are two ways to spawn a process on the BEAM, `spawn` and `spawn_link`.
 Because `spawn_link` links the child process to the process which spawned it, it
@@ -530,7 +530,7 @@ filter |> map          163.15 K        6.13 μs   ±296.65%        5.16 μs     
 for comprehension      157.76 K        6.34 μs   ±269.05%        5.39 μs       12.38 μs
 flat_map               116.20 K        8.61 μs   ±192.50%        7.69 μs       16.06 μs
 
-Comparison: 
+Comparison:
 reduce |> reverse      167.19 K
 filter |> map          163.15 K - 1.02x slower
 for comprehension      157.76 K - 1.06x slower
@@ -553,7 +553,7 @@ for comprehension        1.73 K      579.06 μs    ±14.77%      548.57 μs     
 filter |> map            1.72 K      582.49 μs    ±19.98%      536.60 μs     1069.09 μs
 flat_map                 1.21 K      824.01 μs    ±18.25%      765.08 μs     1535.27 μs
 
-Comparison: 
+Comparison:
 reduce |> reverse        1.76 K
 for comprehension        1.73 K - 1.02x slower
 filter |> map            1.72 K - 1.02x slower
@@ -576,7 +576,7 @@ filter |> map             16.35       61.15 ms    ±12.88%       59.24 ms       
 reduce |> reverse         16.20       61.72 ms    ±14.36%       57.73 ms       83.17 ms
 flat_map                  11.71       85.43 ms    ±13.90%       78.94 ms      113.50 ms
 
-Comparison: 
+Comparison:
 for comprehension         16.48
 filter |> map             16.35 - 1.01x slower
 reduce |> reverse         16.20 - 1.02x slower
@@ -589,6 +589,75 @@ for comprehension         8.16 MB
 filter |> map            13.34 MB - 1.63x memory usage
 reduce |> reverse         8.16 MB - 1.00x memory usage
 flat_map                 13.64 MB - 1.67x memory usage
+
+**All measurements for memory usage were the same**
+```
+
+#### String.slice/3 vs :binary.part/3 [code](code/general/string_slice.exs)
+
+From `String.slice/3` [documentation](https://hexdocs.pm/elixir/String.html#slice/3):
+Remember this function works with Unicode graphemes and considers the slices to represent grapheme offsets. If you want to split on raw bytes, check `Kernel.binary_part/3` instead.
+
+```
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz
+Number of Available Cores: 12
+Available memory: 16 GB
+Elixir 1.9.1
+Erlang 22.0.7
+
+Benchmark suite executing with the following configuration:
+warmup: 100 ms
+time: 2 s
+memory time: 10 ms
+parallel: 1
+inputs: Large string (10 Thousand Numbers), Small string (10 Numbers)
+Estimated total run time: 12.66 s
+
+Benchmarking :binary.part/3 with input Large string (10 Thousand Numbers)...
+Benchmarking :binary.part/3 with input Small string (10 Numbers)...
+Benchmarking String.slice/3 with input Large string (10 Thousand Numbers)...
+Benchmarking String.slice/3 with input Small string (10 Numbers)...
+Benchmarking binary_part/3 with input Large string (10 Thousand Numbers)...
+Benchmarking binary_part/3 with input Small string (10 Numbers)...
+
+##### With input Large string (10 Thousand Numbers) #####
+Name                     ips        average  deviation         median         99th %
+binary_part/3        17.23 M       58.03 ns  ±4513.98%          80 ns         180 ns
+:binary.part/3        3.96 M      252.32 ns  ±8577.24%           0 ns         980 ns
+String.slice/3        1.39 M      720.21 ns   ±755.41%         980 ns         980 ns
+
+Comparison:
+binary_part/3        17.23 M
+:binary.part/3        3.96 M - 4.35x slower +194.29 ns
+String.slice/3        1.39 M - 12.41x slower +662.18 ns
+
+Memory usage statistics:
+
+Name              Memory usage
+binary_part/3              0 B
+:binary.part/3             0 B - 1.00x memory usage +0 B
+String.slice/3           880 B - ∞ x memory usage +880 B
+
+**All measurements for memory usage were the same**
+
+##### With input Small string (10 Numbers) #####
+Name                     ips        average  deviation         median         99th %
+binary_part/3        17.25 M       57.97 ns  ±4482.36%          80 ns         180 ns
+:binary.part/3       15.71 M       63.64 ns  ±6789.17%          80 ns          80 ns
+String.slice/3        1.38 M      726.17 ns  ±1532.43%         980 ns         980 ns
+
+Comparison:
+binary_part/3        17.25 M
+:binary.part/3       15.71 M - 1.10x slower +5.67 ns
+String.slice/3        1.38 M - 12.53x slower +668.20 ns
+
+Memory usage statistics:
+
+Name              Memory usage
+binary_part/3              0 B
+:binary.part/3             0 B - 1.00x memory usage +0 B
+String.slice/3           880 B - ∞ x memory usage +880 B
 
 **All measurements for memory usage were the same**
 ```
