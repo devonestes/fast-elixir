@@ -26,6 +26,7 @@ Help us collect benchmarks! Please [read the contributing guide](CONTRIBUTING.md
 - [Comparing strings vs. atoms](#comparing-strings-vs-atoms-code)
 - [spawn vs. spawn_link](#spawn-vs-spawn_link-code)
 - [Replacements for Enum.filter_map/3](#replacements-for-enumfilter_map3-code)
+- [Filtering maps](#filtering-maps-code)
 
 #### Map Lookup vs. Pattern Matching Lookup [code](code/general/map_lookup_vs_pattern_matching.exs)
 
@@ -658,6 +659,115 @@ Name              Memory usage
 binary_part/3              0 B
 :binary.part/3             0 B - 1.00x memory usage +0 B
 String.slice/3           880 B - ∞ x memory usage +880 B
+
+**All measurements for memory usage were the same**
+```
+
+#### Filtering maps [code](code/general/string_slice.exs)
+
+If we have a map and want to filter out key-value pairs from that map, there are
+several ways to do it. However, because of some optimizations in Erlang,
+`:maps.filter/2` is faster than any of the versions implemented in Elixir.
+If you look at the benchmark code, you'll notice that the function used for
+filtering takes two arguments (the key and value) instead of one (a tuple with
+the key and value), and it's this difference that is responsible for the
+decreased execution time and memory usage.
+
+```
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz
+Number of Available Cores: 12
+Available memory: 16 GB
+Elixir 1.9.1
+Erlang 22.1.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 10 s
+memory time: 1 s
+parallel: 1
+inputs: Large (10_000), Medium (100), Small (1)
+Estimated total run time: 2.60 min
+
+Benchmarking :maps.filter with input Large (10_000)...
+Benchmarking :maps.filter with input Medium (100)...
+Benchmarking :maps.filter with input Small (1)...
+Benchmarking Enum.filter/2 |> Enum.into/2 with input Large (10_000)...
+Benchmarking Enum.filter/2 |> Enum.into/2 with input Medium (100)...
+Benchmarking Enum.filter/2 |> Enum.into/2 with input Small (1)...
+Benchmarking Enum.filter/2 |> Map.new/1 with input Large (10_000)...
+Benchmarking Enum.filter/2 |> Map.new/1 with input Medium (100)...
+Benchmarking Enum.filter/2 |> Map.new/1 with input Small (1)...
+Benchmarking for with input Large (10_000)...
+Benchmarking for with input Medium (100)...
+Benchmarking for with input Small (1)...
+
+##### With input Large (10_000) #####
+Name                                   ips        average  deviation         median         99th %
+:maps.filter                        787.95        1.27 ms    ±17.36%        1.24 ms        2.09 ms
+for                                 734.04        1.36 ms    ±24.47%        1.31 ms        1.85 ms
+Enum.filter/2 |> Enum.into/2        712.02        1.40 ms    ±29.52%        1.37 ms        1.83 ms
+Enum.filter/2 |> Map.new/1          704.65        1.42 ms    ±27.76%        1.38 ms        1.89 ms
+
+Comparison:
+:maps.filter                        787.95
+for                                 734.04 - 1.07x slower +0.0932 ms
+Enum.filter/2 |> Enum.into/2        712.02 - 1.11x slower +0.135 ms
+Enum.filter/2 |> Map.new/1          704.65 - 1.12x slower +0.150 ms
+
+Memory usage statistics:
+
+Name                            Memory usage
+:maps.filter                       700.70 KB
+for                                802.84 KB - 1.15x memory usage +102.14 KB
+Enum.filter/2 |> Enum.into/2       802.86 KB - 1.15x memory usage +102.16 KB
+Enum.filter/2 |> Map.new/1         802.86 KB - 1.15x memory usage +102.16 KB
+
+**All measurements for memory usage were the same**
+
+##### With input Medium (100) #####
+Name                                   ips        average  deviation         median         99th %
+:maps.filter                      100.64 K        9.94 μs   ±175.28%           9 μs          26 μs
+Enum.filter/2 |> Map.new/1         85.42 K       11.71 μs   ±110.89%          11 μs          32 μs
+for                                81.34 K       12.29 μs   ±132.99%          11 μs          32 μs
+Enum.filter/2 |> Enum.into/2       80.41 K       12.44 μs   ±120.11%          12 μs          31 μs
+
+Comparison:
+:maps.filter                      100.64 K
+Enum.filter/2 |> Map.new/1         85.42 K - 1.18x slower +1.77 μs
+for                                81.34 K - 1.24x slower +2.36 μs
+Enum.filter/2 |> Enum.into/2       80.41 K - 1.25x slower +2.50 μs
+
+Memory usage statistics:
+
+Name                            Memory usage
+:maps.filter                         5.70 KB
+Enum.filter/2 |> Map.new/1           7.84 KB - 1.38x memory usage +2.15 KB
+for                                  7.84 KB - 1.38x memory usage +2.15 KB
+Enum.filter/2 |> Enum.into/2         7.84 KB - 1.38x memory usage +2.15 KB
+
+**All measurements for memory usage were the same**
+
+##### With input Small (1) #####
+Name                                   ips        average  deviation         median         99th %
+:maps.filter                        2.74 M      365.22 ns  ±9695.02%           0 ns        1000 ns
+for                                 2.05 M      487.50 ns  ±6665.49%           0 ns        1000 ns
+Enum.filter/2 |> Map.new/1          1.97 M      508.17 ns  ±9786.44%           0 ns        1000 ns
+Enum.filter/2 |> Enum.into/2        1.86 M      536.23 ns ±10066.95%           0 ns        1000 ns
+
+Comparison:
+:maps.filter                        2.74 M
+for                                 2.05 M - 1.33x slower +122.28 ns
+Enum.filter/2 |> Map.new/1          1.97 M - 1.39x slower +142.95 ns
+Enum.filter/2 |> Enum.into/2        1.86 M - 1.47x slower +171.01 ns
+
+Memory usage statistics:
+
+Name                            Memory usage
+:maps.filter                           136 B
+for                                    248 B - 1.82x memory usage +112 B
+Enum.filter/2 |> Map.new/1             248 B - 1.82x memory usage +112 B
+Enum.filter/2 |> Enum.into/2           248 B - 1.82x memory usage +112 B
 
 **All measurements for memory usage were the same**
 ```
