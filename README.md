@@ -663,7 +663,7 @@ String.slice/3           880 B - ∞ x memory usage +880 B
 **All measurements for memory usage were the same**
 ```
 
-#### Filtering maps [code](code/general/string_slice.exs)
+#### Filtering maps [code](code/general/filtering_maps.exs)
 
 If we have a map and want to filter out key-value pairs from that map, there are
 several ways to do it. However, because of some optimizations in Erlang,
