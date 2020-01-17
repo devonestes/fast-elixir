@@ -111,20 +111,21 @@ remember to flatten the resulting nested list, but it's a huge performance
 optimization on larger lists.
 
 ```
-$ mix run code/general/concat_vs_cons.exs
-Operating System: macOS
-CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
-Number of Available Cores: 4
-Available memory: 8 GB
-Elixir 1.6.3
-Erlang 20.3
+$ mix run ./code/general/concat_vs_cons.exs
+Operating System: Linux
+CPU Information: Intel(R) Core(TM) i7-9700KF CPU @ 3.60GHz
+Number of Available Cores: 8
+Available memory: 31.33 GB
+Elixir 1.9.1
+Erlang 22.1.2
+
 Benchmark suite executing with the following configuration:
 warmup: 2 s
 time: 10 s
+memory time: 0 ns
 parallel: 1
 inputs: Large (30,000 items), Medium (3,000 items), Small (30 items)
-Estimated total run time: 1.80 min
-
+Estimated total run time: 2.40 min
 
 Benchmarking Concatenation with input Large (30,000 items)...
 Benchmarking Concatenation with input Medium (3,000 items)...
@@ -135,39 +136,48 @@ Benchmarking Cons + Flatten with input Small (30 items)...
 Benchmarking Cons + Reverse + Flatten with input Large (30,000 items)...
 Benchmarking Cons + Reverse + Flatten with input Medium (3,000 items)...
 Benchmarking Cons + Reverse + Flatten with input Small (30 items)...
+Benchmarking Reverse + Concatenation + Reverse with input Large (30,000 items)...
+Benchmarking Reverse + Concatenation + Reverse with input Medium (3,000 items)...
+Benchmarking Reverse + Concatenation + Reverse with input Small (30 items)...
 
 ##### With input Large (30,000 items) #####
-Name                               ips        average  deviation         median         99th %
-Cons + Flatten                 1050.17        0.95 ms    ±21.56%        0.91 ms        1.76 ms
-Cons + Reverse + Flatten        963.62        1.04 ms    ±20.34%        0.95 ms        1.88 ms
-Concatenation                     1.15      873.22 ms     ±7.07%      849.37 ms     1057.06 ms
+Name                                        ips        average  deviation         median         99th %
+Cons + Flatten                           2.31 K      432.24 μs    ±14.99%      428.40 μs      476.00 μs
+Cons + Reverse + Flatten                 2.19 K      456.21 μs     ±3.51%      453.04 μs      505.64 μs
+Reverse + Concatenation + Reverse        1.49 K      670.44 μs    ±23.61%      665.81 μs      739.61 μs
+Concatenation                         0.00288 K   346621.03 μs     ±1.34%   345434.00 μs   358651.55 μs
 
 Comparison:
-Cons + Flatten                 1050.17
-Cons + Reverse + Flatten        963.62 - 1.09x slower
-Concatenation                     1.15 - 917.03x slower
+Cons + Flatten                           2.31 K
+Cons + Reverse + Flatten                 2.19 K - 1.06x slower +23.97 μs
+Reverse + Concatenation + Reverse        1.49 K - 1.55x slower +238.20 μs
+Concatenation                         0.00288 K - 801.91x slower +346188.79 μs
 
 ##### With input Medium (3,000 items) #####
-Name                               ips        average  deviation         median         99th %
-Cons + Flatten                 11.43 K       87.45 μs    ±23.38%          79 μs      166.32 μs
-Cons + Reverse + Flatten       10.88 K       91.93 μs    ±83.54%          82 μs         185 μs
-Concatenation                  0.138 K     7263.24 μs    ±14.32%        6884 μs    11724.06 μs
+Name                                        ips        average  deviation         median         99th %
+Cons + Flatten                          25.56 K       39.13 μs    ±13.42%       37.81 μs       50.58 μs
+Cons + Reverse + Flatten                24.44 K       40.92 μs    ±14.20%       39.33 μs       48.14 μs
+Reverse + Concatenation + Reverse       19.26 K       51.93 μs    ±14.22%       48.62 μs       70.20 μs
+Concatenation                            0.27 K     3700.64 μs     ±4.96%     3672.52 μs     4387.75 μs
 
 Comparison:
-Cons + Flatten                 11.43 K
-Cons + Reverse + Flatten       10.88 K - 1.05x slower
-Concatenation                  0.138 K - 83.05x slower
+Cons + Flatten                          25.56 K
+Cons + Reverse + Flatten                24.44 K - 1.05x slower +1.80 μs
+Reverse + Concatenation + Reverse       19.26 K - 1.33x slower +12.80 μs
+Concatenation                            0.27 K - 94.58x slower +3661.51 μs
 
 ##### With input Small (30 items) #####
-Name                               ips        average  deviation         median         99th %
-Cons + Reverse + Flatten      891.07 K        1.12 μs   ±336.67%           1 μs           2 μs
-Cons + Flatten                890.95 K        1.12 μs   ±473.42%           1 μs        2.10 μs
-Concatenation                 717.19 K        1.39 μs  ±6508.63%           1 μs           2 μs
+Name                                        ips        average  deviation         median         99th %
+Cons + Reverse + Flatten                 1.64 M      609.34 ns  ±4551.93%         483 ns         745 ns
+Concatenation                            1.59 M      627.84 ns  ±4177.04%         425 ns        1340 ns
+Cons + Flatten                           1.58 M      634.79 ns  ±5708.60%         465 ns        1291 ns
+Reverse + Concatenation + Reverse        1.56 M      642.68 ns  ±4112.06%         521 ns        1389 ns
 
 Comparison:
-Cons + Reverse + Flatten      891.07 K
-Cons + Flatten                890.95 K - 1.00x slower
-Concatenation                 717.19 K - 1.24x slower
+Cons + Reverse + Flatten                 1.64 M
+Concatenation                            1.59 M - 1.03x slower +18.50 ns
+Cons + Flatten                           1.58 M - 1.04x slower +25.45 ns
+Reverse + Concatenation + Reverse        1.56 M - 1.05x slower +33.33 ns
 ```
 
 #### Putting into maps with `Map.put` and `put_in` [code](code/general/map_put_vs_put_in.exs)
@@ -789,7 +799,6 @@ Thank you in advance! :wink: :beer:
 - [Credo](https://github.com/rrrene/credo)
 
   Wonderful static analysis tool by [@rrrene](https://github.com/rrrene). It's not _just_ about speed, but it will flag some performance issues.
-
 
 Brought to you by [@devoncestes](https://twitter.com/devoncestes)
 
