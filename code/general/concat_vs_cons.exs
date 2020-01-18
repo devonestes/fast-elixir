@@ -21,6 +21,16 @@ end
 
 defmodule ListAdd.Slow do
   def add_lists(enumerator, list) do
+    enumerator
+    |> Enum.reduce([0], fn _, acc ->
+      Enum.reverse(list) ++ acc
+    end)
+    |> Enum.reverse()
+  end
+end
+
+defmodule ListAdd.Slowest do
+  def add_lists(enumerator, list) do
     Enum.reduce(enumerator, [0], fn _, acc ->
       acc ++ list
     end)
@@ -37,9 +47,12 @@ defmodule ListAdd.Benchmark do
   def benchmark do
     Benchee.run(
       %{
-        "Cons + Flatten"           => fn enumerator -> bench_func(enumerator, ListAdd.Fast) end,
+        "Cons + Flatten" => fn enumerator -> bench_func(enumerator, ListAdd.Fast) end,
         "Cons + Reverse + Flatten" => fn enumerator -> bench_func(enumerator, ListAdd.Medium) end,
-        "Concatenation"            => fn enumerator -> bench_func(enumerator, ListAdd.Slow) end
+        "Reverse + Concatenation + Reverse" => fn enumerator ->
+          bench_func(enumerator, ListAdd.Slow)
+        end,
+        "Concatenation" => fn enumerator -> bench_func(enumerator, ListAdd.Slowest) end
       },
       time: 10,
       inputs: @inputs,
@@ -54,9 +67,9 @@ defmodule ListAdd.Benchmark do
   end
 end
 
-#expected = [0, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3]
-#IO.inspect(ListAdd.Fast.add_lists(0..4, [1, 2, 3]) == expected)
-#IO.inspect(ListAdd.Slow.add_lists(0..4, [1, 2, 3]) == expected)
-#IO.inspect(ListAdd.Medium.add_lists(0..4, [1, 2, 3]) == expected)
+# expected = [0, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3]
+# IO.inspect(ListAdd.Fast.add_lists(0..4, [1, 2, 3]) == expected)
+# IO.inspect(ListAdd.Slow.add_lists(0..4, [1, 2, 3]) == expected)
+# IO.inspect(ListAdd.Medium.add_lists(0..4, [1, 2, 3]) == expected)
 
 ListAdd.Benchmark.benchmark()
