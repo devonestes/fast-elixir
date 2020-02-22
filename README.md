@@ -253,52 +253,71 @@ using Elixir's streaming approach rather than using `String.split/2`.
 ```
 $ mix run code/general/string_split_large_strings.exs
 Operating System: macOS
-CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
-Number of Available Cores: 4
-Available memory: 8 GB
-Elixir 1.6.3
-Erlang 20.3
+CPU Information: Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz
+Number of Available Cores: 12
+Available memory: 16 GB
+Elixir 1.10.1
+Erlang 22.2.7
+
 Benchmark suite executing with the following configuration:
 warmup: 2 s
 time: 10 s
+memory time: 0 ns
 parallel: 1
 inputs: Large string (1 Million Numbers), Medium string (10 Thousand Numbers), Small string (1 Hundred Numbers)
-Estimated total run time: 1.20 min
-
+Estimated total run time: 2.40 min
 
 Benchmarking split with input Large string (1 Million Numbers)...
 Benchmarking split with input Medium string (10 Thousand Numbers)...
 Benchmarking split with input Small string (1 Hundred Numbers)...
+Benchmarking split erlang with input Large string (1 Million Numbers)...
+Benchmarking split erlang with input Medium string (10 Thousand Numbers)...
+Benchmarking split erlang with input Small string (1 Hundred Numbers)...
+Benchmarking split regex with input Large string (1 Million Numbers)...
+Benchmarking split regex with input Medium string (10 Thousand Numbers)...
+Benchmarking split regex with input Small string (1 Hundred Numbers)...
 Benchmarking splitter |> to_list with input Large string (1 Million Numbers)...
 Benchmarking splitter |> to_list with input Medium string (10 Thousand Numbers)...
 Benchmarking splitter |> to_list with input Small string (1 Hundred Numbers)...
 
 ##### With input Large string (1 Million Numbers) #####
 Name                          ips        average  deviation         median         99th %
-splitter |> to_list          2.81         0.36 s    ±17.24%         0.34 s         0.52 s
-split                        0.29         3.48 s     ±0.24%         3.49 s         3.49 s
+split                       13.54       73.86 ms    ±30.85%       63.48 ms      130.82 ms
+splitter |> to_list          3.86      258.82 ms    ±20.13%      239.00 ms      420.32 ms
+split erlang                 1.22      819.31 ms     ±1.10%      822.40 ms      829.39 ms
+split regex                  0.86     1157.56 ms    ±11.00%     1112.62 ms     1389.42 ms
 
-Comparison:
-splitter |> to_list          2.81
-split                        0.29 - 9.78x slower
+Comparison: 
+split                       13.54
+splitter |> to_list          3.86 - 3.50x slower +184.97 ms
+split erlang                 1.22 - 11.09x slower +745.45 ms
+split regex                  0.86 - 15.67x slower +1083.70 ms
 
 ##### With input Medium string (10 Thousand Numbers) #####
 Name                          ips        average  deviation         median         99th %
-split                      1.73 K        0.58 ms    ±34.42%        0.71 ms        0.86 ms
-splitter |> to_list        0.33 K        3.04 ms    ±18.95%        3.11 ms        4.76 ms
+split                     4243.75        0.24 ms    ±53.17%       0.196 ms        0.40 ms
+splitter |> to_list        456.08        2.19 ms    ±13.55%        2.21 ms        2.96 ms
+split erlang               174.75        5.72 ms     ±7.36%        5.74 ms        7.24 ms
+split regex                100.40        9.96 ms    ±58.15%        9.46 ms       14.53 ms
 
-Comparison:
-split                      1.73 K
-splitter |> to_list        0.33 K - 5.25x slower
+Comparison: 
+split                     4243.75
+splitter |> to_list        456.08 - 9.30x slower +1.96 ms
+split erlang               174.75 - 24.28x slower +5.49 ms
+split regex                100.40 - 42.27x slower +9.72 ms
 
 ##### With input Small string (1 Hundred Numbers) #####
 Name                          ips        average  deviation         median         99th %
-split                    302.83 K        3.30 μs  ±1848.10%           3 μs           6 μs
-splitter |> to_list       48.08 K       20.80 μs   ±215.29%          18 μs          82 μs
+split                    389.84 K        2.57 μs  ±1112.00%           2 μs           4 μs
+splitter |> to_list       62.11 K       16.10 μs    ±81.51%          15 μs          40 μs
+split erlang              18.07 K       55.35 μs    ±59.21%          42 μs         162 μs
+split regex               11.20 K       89.25 μs    ±15.58%          86 μs         157 μs
 
-Comparison:
-split                    302.83 K
-splitter |> to_list       48.08 K - 6.30x slower
+Comparison: 
+split                    389.84 K
+splitter |> to_list       62.11 K - 6.28x slower +13.54 μs
+split erlang              18.07 K - 21.58x slower +52.78 μs
+split regex               11.20 K - 34.79x slower +86.69 μs
 ```
 
 #### `sort` vs. `sort_by` [code](code/general/sort_vs_sort_by.exs)
