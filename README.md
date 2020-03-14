@@ -20,7 +20,7 @@ Help us collect benchmarks! Please [read the contributing guide](CONTRIBUTING.md
 - [IO Lists vs. String Concatenation](#io-lists-vs-string-concatenation-code)
 - [Combining lists with `|` vs. `++`](#combining-lists-with--vs--code)
 - [Putting into maps with `Map.put` and `put_in`](#putting-into-maps-with-mapput-and-put_in-code)
-- [Splitting Large Strings](#splitting-large-strings-code)
+- [Splitting Strings](#splitting-large-strings-code)
 - [`sort` vs. `sort_by`](#sort-vs-sort_by-code)
 - [Retrieving state from ets tables vs. Gen Servers](#retrieving-state-from-ets-tables-vs-gen-servers-code)
 - [Comparing strings vs. atoms](#comparing-strings-vs-atoms-code)
@@ -247,8 +247,9 @@ put_in/3       337.47 K - 2.01x slower
 
 #### Splitting Large Strings [code](code/general/string_split_large_strings.exs)
 
-Due to a known issue in Erlang, splitting very large strings can be done faster
-using Elixir's streaming approach rather than using `String.split/2`.
+Elixir's `String.split/2` is the fastest option for splitting strings by far, but
+using a String literal as the splitter instead of a regex will yield significant
+performance benefits.
 
 ```
 $ mix run code/general/string_split_large_strings.exs
