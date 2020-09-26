@@ -1,6 +1,14 @@
-defmodule RetrieveState.Fast do
+defmodule RetrieveState.FastETS do
   def get_state(ets_pid) do
     :ets.lookup(ets_pid, :stored_state)
+  end
+end
+
+defmodule RetrieveState.FastPersistentTerm do
+  # One should be cautious because PersistentTerms are global
+  # and also are optimized for reading but not for writing
+  def get_state(key) do
+    :persistent_term.get(key)
   end
 end
 
@@ -28,9 +36,13 @@ defmodule RetrieveState.Benchmark do
     :ets.insert(ets_pid, {:stored_state, :returned_state})
     StateHolder.start_link()
 
+    persistent_term_key = :my_key
+    :persistent_term.put(persistent_term_key, :returned_state)
+
     Benchee.run(
       %{
-        "ets table" => fn -> RetrieveState.Fast.get_state(ets_pid) end,
+        "ets table" => fn -> RetrieveState.FastETS.get_state(ets_pid) end,
+        "persistent term" => fn -> RetrieveState.FastPersistentTerm.get_state(persistent_term_key) end,
         "gen server" => fn -> RetrieveState.Slow.get_state() end
       },
       time: 10,

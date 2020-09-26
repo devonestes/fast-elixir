@@ -288,7 +288,7 @@ splitter |> to_list          3.86      258.82 ms    ±20.13%      239.00 ms     
 split erlang                 1.22      819.31 ms     ±1.10%      822.40 ms      829.39 ms
 split regex                  0.86     1157.56 ms    ±11.00%     1112.62 ms     1389.42 ms
 
-Comparison: 
+Comparison:
 split                       13.54
 splitter |> to_list          3.86 - 3.50x slower +184.97 ms
 split erlang                 1.22 - 11.09x slower +745.45 ms
@@ -301,7 +301,7 @@ splitter |> to_list        456.08        2.19 ms    ±13.55%        2.21 ms     
 split erlang               174.75        5.72 ms     ±7.36%        5.74 ms        7.24 ms
 split regex                100.40        9.96 ms    ±58.15%        9.46 ms       14.53 ms
 
-Comparison: 
+Comparison:
 split                     4243.75
 splitter |> to_list        456.08 - 9.30x slower +1.96 ms
 split erlang               174.75 - 24.28x slower +5.49 ms
@@ -314,7 +314,7 @@ splitter |> to_list       62.11 K       16.10 μs    ±81.51%          15 μs   
 split erlang              18.07 K       55.35 μs    ±59.21%          42 μs         162 μs
 split regex               11.20 K       89.25 μs    ±15.58%          86 μs         157 μs
 
-Comparison: 
+Comparison:
 split                    389.84 K
 splitter |> to_list       62.11 K - 6.28x slower +13.54 μs
 split erlang              18.07 K - 21.58x slower +52.78 μs
@@ -358,7 +358,7 @@ sort/2           4.74 K - 1.04x slower
 sort_by/2        4.53 K - 1.09x slower
 ```
 
-#### Retrieving state from ets tables vs. Gen Servers [code](code/general/ets_vs_gen_server.exs)
+#### Retrieving state from persistent_terms vs ets tables vs. Gen Servers [code](code/general/ets_vs_gen_server_vs_persistent_term.exs)
 
 There are many differences between Gen Servers and ets tables, but many people
 have often praised ets tables for being extremely fast. For the simple case of
@@ -367,32 +367,41 @@ faster for reads. For more complicated use cases, and for comparisons of writes
 instead of reads, further benchmarks are needed, but so far ets lives up to its
 reputation for speed.
 
+Persistent Terms, on the other hand, have the advantage of a simpler interface, but
+aren't fit for all applications due to their global nature. Also, they are by design
+optimized for reading instead of writing, which renders them unfit in applications which
+need to rewrite the state a lot.
+
 ```
-$ mix run code/general/ets_vs_gen_server.exs
-Operating System: macOS
-CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
-Number of Available Cores: 4
-Available memory: 8 GB
-Elixir 1.6.3
-Erlang 20.3
+$ mix run ./code/general/ets_vs_gen_server_vs_persistent_term.exs
+Operating System: Linux
+CPU Information: Intel(R) Core(TM) i7-9700KF CPU @ 3.60GHz
+Number of Available Cores: 8
+Available memory: 31.28 GB
+Elixir 1.9.1
+Erlang 22.1.2
+
 Benchmark suite executing with the following configuration:
 warmup: 2 s
 time: 10 s
+memory time: 0 ns
 parallel: 1
 inputs: none specified
-Estimated total run time: 24 s
-
+Estimated total run time: 36 s
 
 Benchmarking ets table...
 Benchmarking gen server...
+Benchmarking persistent term...
 
-Name                 ips        average  deviation         median         99th %
-ets table         9.12 M       0.110 μs   ±365.39%       0.100 μs        0.23 μs
-gen server        0.29 M        3.46 μs  ±2532.35%           3 μs          10 μs
+Name                      ips        average  deviation         median         99th %
+persistent term      102.86 M        9.72 ns  ±1263.61%           8 ns          17 ns
+ets table             16.21 M       61.68 ns ±50527.06%          34 ns          80 ns
+gen server             0.87 M     1145.54 ns  ±1353.69%        1086 ns        1403 ns
 
 Comparison:
-ets table         9.12 M
-gen server        0.29 M - 31.53x slower
+persistent term      102.86 M
+ets table             16.21 M - 6.34x slower +51.96 ns
+gen server             0.87 M - 117.83x slower +1135.81 ns
 ```
 
 #### Comparing strings vs. atoms [code](code/general/comparing_strings_vs_atoms.exs)
