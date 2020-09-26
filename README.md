@@ -35,32 +35,40 @@ first consider assigning a map as a module attribute and looking that up.
 However, it's significantly faster to use pattern matching to define functions
 that behave like a key-value based data structure.
 
+The code also includes a more practical implementation for the pattern matching-based alternative,
+which used metaprogramming to make development easier. As the benchmark below shows, both of the pattern mathing-based
+alternatives are statistically identical because, in essence, the BEAM receives the same code from the Elixir compiler.
+
 ```
-$ mix run code/general/map_lookup_vs_pattern_matching.exs
-Operating System: macOS
-CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
-Number of Available Cores: 4
-Available memory: 8 GB
-Elixir 1.6.3
-Erlang 20.3
+mix run ./code/general/map_lookup_vs_pattern_matching.exs
+Operating System: Linux
+CPU Information: Intel(R) Core(TM) i7-9700KF CPU @ 3.60GHz
+Number of Available Cores: 8
+Available memory: 31.28 GB
+Elixir 1.9.1
+Erlang 22.1.2
+
 Benchmark suite executing with the following configuration:
 warmup: 2 s
 time: 10 s
+memory time: 0 ns
 parallel: 1
 inputs: none specified
-Estimated total run time: 24 s
-
+Estimated total run time: 36 s
 
 Benchmarking Map Lookup...
-Benchmarking Pattern Matching...
+Benchmarking Pattern Matching with Didatic Implementation...
+Benchmarking Pattern Matching with Practical Implementation...
 
-Name                       ips        average  deviation         median         99th %
-Pattern Matching      891.15 K        1.12 μs   ±458.04%           1 μs           2 μs
-Map Lookup            671.59 K        1.49 μs   ±385.22%        1.40 μs           3 μs
+Name                                                     ips        average  deviation         median         99th %
+Pattern Matching with Practical Implementation        1.94 M      516.72 ns  ±5812.27%         443 ns        1187 ns
+Pattern Matching with Didatic Implementation          1.93 M      518.50 ns  ±5898.14%         445 ns        1188 ns
+Map Lookup                                            1.41 M      707.93 ns  ±1224.87%         682 ns         841 ns
 
 Comparison:
-Pattern Matching      891.15 K
-Map Lookup            671.59 K - 1.33x slower
+Pattern Matching with Practical Implementation        1.94 M
+Pattern Matching with Didatic Implementation          1.93 M - 1.00x slower +1.78 ns
+Map Lookup                                            1.41 M - 1.37x slower +191.22 ns
 ```
 
 #### IO Lists vs. String Concatenation [code](code/general/io_lists_vs_concatenation.exs)
@@ -288,7 +296,7 @@ splitter |> to_list          3.86      258.82 ms    ±20.13%      239.00 ms     
 split erlang                 1.22      819.31 ms     ±1.10%      822.40 ms      829.39 ms
 split regex                  0.86     1157.56 ms    ±11.00%     1112.62 ms     1389.42 ms
 
-Comparison: 
+Comparison:
 split                       13.54
 splitter |> to_list          3.86 - 3.50x slower +184.97 ms
 split erlang                 1.22 - 11.09x slower +745.45 ms
@@ -301,7 +309,7 @@ splitter |> to_list        456.08        2.19 ms    ±13.55%        2.21 ms     
 split erlang               174.75        5.72 ms     ±7.36%        5.74 ms        7.24 ms
 split regex                100.40        9.96 ms    ±58.15%        9.46 ms       14.53 ms
 
-Comparison: 
+Comparison:
 split                     4243.75
 splitter |> to_list        456.08 - 9.30x slower +1.96 ms
 split erlang               174.75 - 24.28x slower +5.49 ms
@@ -314,7 +322,7 @@ splitter |> to_list       62.11 K       16.10 μs    ±81.51%          15 μs   
 split erlang              18.07 K       55.35 μs    ±59.21%          42 μs         162 μs
 split regex               11.20 K       89.25 μs    ±15.58%          86 μs         157 μs
 
-Comparison: 
+Comparison:
 split                    389.84 K
 splitter |> to_list       62.11 K - 6.28x slower +13.54 μs
 split erlang              18.07 K - 21.58x slower +52.78 μs
