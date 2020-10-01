@@ -24,7 +24,7 @@ end
 
 defmodule RetrieveState.Slow do
   def put_state(value) do
-    :persistent_term.put(:stored_state, :returned_state)
+    :persistent_term.put(:stored_state, value)
   end
 end
 

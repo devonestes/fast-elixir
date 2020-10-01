@@ -23,6 +23,7 @@ Help us collect benchmarks! Please [read the contributing guide](CONTRIBUTING.md
 - [Splitting Strings](#splitting-large-strings-code)
 - [`sort` vs. `sort_by`](#sort-vs-sort_by-code)
 - [Retrieving state from ets tables vs. Gen Servers](#retrieving-state-from-ets-tables-vs-gen-servers-code)
+- [Writing state in ets tables, persistent_term and Gen Servers](#writing-state-from-ets-tables-persistent-term-gen-servers-code)
 - [Comparing strings vs. atoms](#comparing-strings-vs-atoms-code)
 - [spawn vs. spawn_link](#spawn-vs-spawn_link-code)
 - [Replacements for Enum.filter_map/3](#replacements-for-enumfilter_map3-code)
@@ -488,6 +489,49 @@ Comparison:
 ets table         5.11 M
 gen server        0.55 M - 9.31x slower +1.63 μs
 ```
+
+#### Writing state in ets tables, persistent_term and Gen Servers [code](code/general/ets_vs_gen_server_write.exs)
+
+Not only is it faster to read from `ets` or `persistent_term` versus a `GenServer`, but it's also
+much faster to write state in these two options. If you have need for state that needs to be
+stored but without a lot of behavior around that state, `ets` or `persistent_term` is always going
+to be the better choice over a `GenServer`. `persistent_term` is the fastest to read from by far,
+but is global across the VM and also slower to write to, so in most cases `ets` will be the best
+choice for storing state and should be the default option to start with.
+
+```
+$ mix run code/general/ets_vs_gen_server_write.exs
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
+Available memory: 16 GB
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 10 s
+memory time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 36 s
+
+Benchmarking ets table...
+Benchmarking gen server...
+Benchmarking persistent term...
+
+Name                      ips        average  deviation         median         99th %
+ets table              5.22 M      191.61 ns   ±798.69%           0 ns        1000 ns
+persistent term        2.43 M      410.87 ns ±11324.51%           0 ns        1000 ns
+gen server             0.58 M     1715.61 ns   ±367.31%        2000 ns        2000 ns
+
+Comparison:
+ets table              5.22 M
+persistent term        2.43 M - 2.14x slower +219.26 ns
+gen server             0.58 M - 8.95x slower +1524.00 ns
+```
+
+
 
 #### Comparing strings vs. atoms [code](code/general/comparing_strings_vs_atoms.exs)
 
