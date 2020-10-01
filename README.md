@@ -944,6 +944,74 @@ Enum.filter/2 |> Enum.into/2           248 B - 1.82x memory usage +112 B
 **All measurements for memory usage were the same**
 ```
 
+#### Generating a random number with `Enum.rand/1` and `:random.unform/1` [code](code/general/enum_random_vs_rand_uniform.exs)
+
+If you need to generate a random number, do not use `Enum.random/1` as it is 1.31x slower (on average). If you're using Elixir 1.8.2 it gets even slower: 2.46x.
+
+Save using `Enum.random/1` when you want to retrieve a random string from a list of strings, for example.
+
+```
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz
+Number of Available Cores: 4
+Available memory: 16 GB
+Elixir 1.9.0
+Erlang 22.0.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 10 s
+memory time: 0 ns
+parallel: 1
+inputs: Bigger, Medium, Minimal, Small
+Estimated total run time: 1.60 min
+
+Benchmarking :rand.uniform/1 (Fast) with input Bigger...
+Benchmarking :rand.uniform/1 (Fast) with input Medium...
+Benchmarking :rand.uniform/1 (Fast) with input Minimal...
+Benchmarking :rand.uniform/1 (Fast) with input Small...
+Benchmarking Enum.random/1 (Slow) with input Bigger...
+Benchmarking Enum.random/1 (Slow) with input Medium...
+Benchmarking Enum.random/1 (Slow) with input Minimal...
+Benchmarking Enum.random/1 (Slow) with input Small...
+
+##### With input Bigger #####
+Name                                   ips        average  deviation         median         99th %
+:rand.uniform/1 (Fast)        2.16 M      463.02 ns ±10831.68%           0 ns         980 ns
+Enum.random/1 (Slow)          1.62 M      615.71 ns  ±7901.36%         980 ns         980 ns
+
+Comparison: 
+:rand.uniform/1 (Fast)        2.16 M
+Enum.random/1 (Slow)          1.62 M - 1.33x slower +152.70 ns
+
+##### With input Medium #####
+Name                                   ips        average  deviation         median         99th %
+:rand.uniform/1 (Fast)        2.14 M      467.68 ns ±10943.91%           0 ns         980 ns
+Enum.random/1 (Slow)          1.58 M      630.95 ns  ±8071.79%         980 ns         980 ns
+
+Comparison: 
+:rand.uniform/1 (Fast)        2.14 M
+Enum.random/1 (Slow)          1.58 M - 1.35x slower +163.27 ns
+
+##### With input Minimal #####
+Name                                   ips        average  deviation         median         99th %
+:rand.uniform/1 (Fast)        2.11 M      473.88 ns ±10649.67%           0 ns         980 ns
+Enum.random/1 (Slow)          1.62 M      615.96 ns  ±8133.82%         980 ns         980 ns
+
+Comparison: 
+:rand.uniform/1 (Fast)        2.11 M
+Enum.random/1 (Slow)          1.62 M - 1.30x slower +142.08 ns
+
+##### With input Small #####
+Name                                   ips        average  deviation         median         99th %
+:rand.uniform/1 (Fast)        2.05 M      487.42 ns  ±8646.67%           0 ns         980 ns
+Enum.random/1 (Slow)          1.60 M      626.10 ns  ±8133.36%         980 ns         980 ns
+
+Comparison: 
+:rand.uniform/1 (Fast)        2.05 M
+Enum.random/1 (Slow)          1.60 M - 1.28x slower +138.68 ns
+```
+
 ## Something went wrong
 
 Something look wrong to you? :cry: Have a better example? :heart_eyes: Excellent!
