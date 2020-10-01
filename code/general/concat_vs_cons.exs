@@ -21,16 +21,6 @@ end
 
 defmodule ListAdd.Slow do
   def add_lists(enumerator, list) do
-    enumerator
-    |> Enum.reduce([0], fn _, acc ->
-      Enum.reverse(list) ++ acc
-    end)
-    |> Enum.reverse()
-  end
-end
-
-defmodule ListAdd.Slowest do
-  def add_lists(enumerator, list) do
     Enum.reduce(enumerator, [0], fn _, acc ->
       acc ++ list
     end)
@@ -38,10 +28,16 @@ defmodule ListAdd.Slowest do
 end
 
 defmodule ListAdd.Benchmark do
+  @small_list Enum.to_list(1..10)
+  @large_list Enum.to_list(1..1_000)
+
   @inputs %{
-    "Large (30,000 items)" => 1..10_000,
-    "Medium (3,000 items)" => 1..1_000,
-    "Small (30 items)" => 1..10
+    "1,000 small items" => {1..1_000, @small_list},
+    "100 small items" => {1..100, @small_list},
+    "10 small items" => {1..10, @small_list},
+    "1,000 large items" => {1..1_000, @large_list},
+    "100 large items" => {1..1000, @large_list},
+    "10 large items" => {1..10, @large_list},
   }
 
   def benchmark do
@@ -49,10 +45,7 @@ defmodule ListAdd.Benchmark do
       %{
         "Cons + Flatten" => fn enumerator -> bench_func(enumerator, ListAdd.Fast) end,
         "Cons + Reverse + Flatten" => fn enumerator -> bench_func(enumerator, ListAdd.Medium) end,
-        "Reverse + Concatenation + Reverse" => fn enumerator ->
-          bench_func(enumerator, ListAdd.Slow)
-        end,
-        "Concatenation" => fn enumerator -> bench_func(enumerator, ListAdd.Slowest) end
+        "Concatenation" => fn enumerator -> bench_func(enumerator, ListAdd.Slow) end
       },
       time: 10,
       inputs: @inputs,
@@ -60,16 +53,15 @@ defmodule ListAdd.Benchmark do
     )
   end
 
-  @list [1, 2, 3]
-
-  def bench_func(enumerator, module) do
-    module.add_lists(enumerator, @list)
+  def bench_func({enumerator, list}, module) do
+    module.add_lists(enumerator, list)
   end
 end
 
-# expected = [0, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3]
-# IO.inspect(ListAdd.Fast.add_lists(0..4, [1, 2, 3]) == expected)
-# IO.inspect(ListAdd.Slow.add_lists(0..4, [1, 2, 3]) == expected)
-# IO.inspect(ListAdd.Medium.add_lists(0..4, [1, 2, 3]) == expected)
+# Enum.each([ListAdd.Slow, ListAdd.Medium, ListAdd.Fast], fn module ->
+# IO.inspect(
+# [0, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3] == module.add_lists(0..4, [1, 2, 3])
+# )
+# end)
 
 ListAdd.Benchmark.benchmark()
