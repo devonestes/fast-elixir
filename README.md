@@ -23,6 +23,7 @@ Help us collect benchmarks! Please [read the contributing guide](CONTRIBUTING.md
 - [Splitting Strings](#splitting-large-strings-code)
 - [`sort` vs. `sort_by`](#sort-vs-sort_by-code)
 - [Retrieving state from ets tables vs. Gen Servers](#retrieving-state-from-ets-tables-vs-gen-servers-code)
+- [Writing state in ets tables, persistent_term and Gen Servers](#writing-state-from-ets-tables-persistent-term-gen-servers-code)
 - [Comparing strings vs. atoms](#comparing-strings-vs-atoms-code)
 - [spawn vs. spawn_link](#spawn-vs-spawn_link-code)
 - [Replacements for Enum.filter_map/3](#replacements-for-enumfilter_map3-code)
@@ -38,29 +39,30 @@ that behave like a key-value based data structure.
 ```
 $ mix run code/general/map_lookup_vs_pattern_matching.exs
 Operating System: macOS
-CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
-Number of Available Cores: 4
-Available memory: 8 GB
-Elixir 1.6.3
-Erlang 20.3
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
+Available memory: 16 GB
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
+
 Benchmark suite executing with the following configuration:
 warmup: 2 s
 time: 10 s
+memory time: 0 ns
 parallel: 1
 inputs: none specified
 Estimated total run time: 24 s
-
 
 Benchmarking Map Lookup...
 Benchmarking Pattern Matching...
 
 Name                       ips        average  deviation         median         99th %
-Pattern Matching      891.15 K        1.12 μs   ±458.04%           1 μs           2 μs
-Map Lookup            671.59 K        1.49 μs   ±385.22%        1.40 μs           3 μs
+Pattern Matching      909.12 K        1.10 μs  ±3606.70%           1 μs           2 μs
+Map Lookup            792.96 K        1.26 μs   ±532.10%           1 μs           2 μs
 
 Comparison:
-Pattern Matching      891.15 K
-Map Lookup            671.59 K - 1.33x slower
+Pattern Matching      909.12 K
+Map Lookup            792.96 K - 1.15x slower +0.161 μs
 ```
 
 #### IO Lists vs. String Concatenation [code](code/general/io_lists_vs_concatenation.exs)
@@ -73,30 +75,86 @@ interpolation.
 ```
 $ mix run code/general/io_lists_vs_concatenation.exs
 Operating System: macOS
-CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
-Number of Available Cores: 4
-Available memory: 8 GB
-Elixir 1.6.3
-Erlang 20.3
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
+Available memory: 16 GB
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
+
 Benchmark suite executing with the following configuration:
 warmup: 2 s
 time: 10 s
+memory time: 0 ns
 parallel: 1
-inputs: none specified
-Estimated total run time: 24 s
+inputs: 100 3-character strings, 100 300-character strings, 5 3-character_strings, 5 300-character_strings, 50 3-character strings, 50 300-character strings
+Estimated total run time: 2.40 min
 
+Benchmarking IO List with input 100 3-character strings...
+Benchmarking IO List with input 100 300-character strings...
+Benchmarking IO List with input 5 3-character_strings...
+Benchmarking IO List with input 5 300-character_strings...
+Benchmarking IO List with input 50 3-character strings...
+Benchmarking IO List with input 50 300-character strings...
+Benchmarking Interpolation with input 100 3-character strings...
+Benchmarking Interpolation with input 100 300-character strings...
+Benchmarking Interpolation with input 5 3-character_strings...
+Benchmarking Interpolation with input 5 300-character_strings...
+Benchmarking Interpolation with input 50 3-character strings...
+Benchmarking Interpolation with input 50 300-character strings...
 
-Benchmarking IO List...
-Benchmarking Interpolation...
-
-
+##### With input 100 3-character strings #####
 Name                    ips        average  deviation         median         99th %
-IO List             17.85 K       56.03 μs   ±472.47%          44 μs         132 μs
-Interpolation       16.25 K       61.53 μs   ±436.51%          47 μs         149 μs
+IO List              1.41 M        0.71 μs  ±4475.40%           1 μs           2 μs
+Interpolation        0.31 M        3.27 μs    ±76.91%           3 μs          11 μs
 
 Comparison:
-IO List             17.85 K
-Interpolation       16.25 K - 1.10x slower
+IO List              1.41 M
+Interpolation        0.31 M - 4.61x slower +2.56 μs
+
+##### With input 100 300-character strings #####
+Name                    ips        average  deviation         median         99th %
+IO List              1.40 M        0.71 μs  ±4411.36%           1 μs           1 μs
+Interpolation        0.20 M        4.90 μs   ±248.22%           4 μs          22 μs
+
+Comparison:
+IO List              1.40 M
+Interpolation        0.20 M - 6.86x slower +4.18 μs
+
+##### With input 5 3-character_strings #####
+Name                    ips        average  deviation         median         99th %
+IO List              5.15 M      194.15 ns  ±2555.27%           0 ns        1000 ns
+Interpolation        1.84 M      544.12 ns  ±4764.73%           0 ns        2000 ns
+
+Comparison:
+IO List              5.15 M
+Interpolation        1.84 M - 2.80x slower +349.96 ns
+
+##### With input 5 300-character_strings #####
+Name                    ips        average  deviation         median         99th %
+IO List              5.03 M      198.76 ns  ±4663.45%           0 ns        1000 ns
+Interpolation        1.92 M      521.81 ns   ±193.09%           0 ns        1000 ns
+
+Comparison:
+IO List              5.03 M
+Interpolation        1.92 M - 2.63x slower +323.05 ns
+
+##### With input 50 3-character strings #####
+Name                    ips        average  deviation         median         99th %
+IO List              1.94 M        0.52 μs  ±6397.19%           0 μs           2 μs
+Interpolation        0.57 M        1.75 μs   ±130.98%           2 μs           2 μs
+
+Comparison:
+IO List              1.94 M
+Interpolation        0.57 M - 3.40x slower +1.24 μs
+
+##### With input 50 300-character strings #####
+Name                    ips        average  deviation         median         99th %
+IO List              2.06 M        0.49 μs  ±8825.39%           0 μs           2 μs
+Interpolation        0.37 M        2.71 μs   ±657.41%           2 μs          14 μs
+
+Comparison:
+IO List              2.06 M
+Interpolation        0.37 M - 5.58x slower +2.22 μs
 ```
 
 #### Combining lists with `|` vs. `++` [code](code/general/concat_vs_cons.exs)
@@ -112,12 +170,120 @@ optimization on larger lists.
 
 ```
 $ mix run ./code/general/concat_vs_cons.exs
-Operating System: Linux
-CPU Information: Intel(R) Core(TM) i7-9700KF CPU @ 3.60GHz
-Number of Available Cores: 8
-Available memory: 31.33 GB
-Elixir 1.9.1
-Erlang 22.1.2
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
+Available memory: 16 GB
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 10 s
+memory time: 0 ns
+parallel: 1
+inputs: 1,000 large items, 1,000 small items, 10 large items, 10 small items, 100 large items, 100 small items
+Estimated total run time: 3.60 min
+
+Benchmarking Concatenation with input 1,000 large items...
+Benchmarking Concatenation with input 1,000 small items...
+Benchmarking Concatenation with input 10 large items...
+Benchmarking Concatenation with input 10 small items...
+Benchmarking Concatenation with input 100 large items...
+Benchmarking Concatenation with input 100 small items...
+Benchmarking Cons + Flatten with input 1,000 large items...
+Benchmarking Cons + Flatten with input 1,000 small items...
+Benchmarking Cons + Flatten with input 10 large items...
+Benchmarking Cons + Flatten with input 10 small items...
+Benchmarking Cons + Flatten with input 100 large items...
+Benchmarking Cons + Flatten with input 100 small items...
+Benchmarking Cons + Reverse + Flatten with input 1,000 large items...
+Benchmarking Cons + Reverse + Flatten with input 1,000 small items...
+Benchmarking Cons + Reverse + Flatten with input 10 large items...
+Benchmarking Cons + Reverse + Flatten with input 10 small items...
+Benchmarking Cons + Reverse + Flatten with input 100 large items...
+Benchmarking Cons + Reverse + Flatten with input 100 small items...
+
+##### With input 1,000 large items #####
+Name                               ips        average  deviation         median         99th %
+Cons + Reverse + Flatten         38.45       26.01 ms     ±6.11%       25.91 ms       30.56 ms
+Cons + Flatten                   38.38       26.06 ms     ±6.39%       26.06 ms       29.32 ms
+Concatenation                    0.179     5573.57 ms     ±0.26%     5573.57 ms     5583.94 ms
+
+Comparison:
+Cons + Reverse + Flatten         38.45
+Cons + Flatten                   38.38 - 1.00x slower +0.0501 ms
+Concatenation                    0.179 - 214.32x slower +5547.56 ms
+
+##### With input 1,000 small items #####
+Name                               ips        average  deviation         median         99th %
+Cons + Reverse + Flatten        3.78 K      264.27 μs    ±19.49%         243 μs         496 μs
+Cons + Flatten                  3.76 K      266.16 μs    ±18.53%         246 μs      491.83 μs
+Concatenation                 0.0626 K    15984.51 μs     ±8.58%       15927 μs    20412.82 μs
+
+Comparison:
+Cons + Reverse + Flatten        3.78 K
+Cons + Flatten                  3.76 K - 1.01x slower +1.90 μs
+Concatenation                 0.0626 K - 60.49x slower +15720.24 μs
+
+##### With input 10 large items #####
+Name                               ips        average  deviation         median         99th %
+Concatenation                   8.33 K      120.04 μs    ±31.79%         111 μs         268 μs
+Cons + Flatten                  5.12 K      195.17 μs    ±20.09%         181 μs         378 μs
+Cons + Reverse + Flatten        5.11 K      195.88 μs    ±20.32%         181 μs         378 μs
+
+Comparison:
+Concatenation                   8.33 K
+Cons + Flatten                  5.12 K - 1.63x slower +75.13 μs
+Cons + Reverse + Flatten        5.11 K - 1.63x slower +75.85 μs
+
+##### With input 10 small items #####
+Name                               ips        average  deviation         median         99th %
+Concatenation                 575.41 K        1.74 μs  ±1951.31%           1 μs           4 μs
+Cons + Flatten                331.62 K        3.02 μs   ±972.07%           3 μs           7 μs
+Cons + Reverse + Flatten      330.05 K        3.03 μs   ±853.79%           3 μs           8 μs
+
+Comparison:
+Concatenation                 575.41 K
+Cons + Flatten                331.62 K - 1.74x slower +1.28 μs
+Cons + Reverse + Flatten      330.05 K - 1.74x slower +1.29 μs
+
+##### With input 100 large items #####
+Name                               ips        average  deviation         median         99th %
+Cons + Reverse + Flatten         38.56       25.93 ms     ±6.25%       25.85 ms       32.02 ms
+Cons + Flatten                   38.35       26.08 ms     ±6.30%       26.04 ms       30.68 ms
+Concatenation                    0.180     5561.40 ms     ±0.41%     5561.40 ms     5577.71 ms
+
+Comparison:
+Cons + Reverse + Flatten         38.56
+Cons + Flatten                   38.35 - 1.01x slower +0.145 ms
+Concatenation                    0.180 - 214.47x slower +5535.47 ms
+
+##### With input 100 small items #####
+Name                               ips        average  deviation         median         99th %
+Cons + Flatten                 38.68 K       25.85 μs    ±32.87%          24 μs          69 μs
+Cons + Reverse + Flatten       38.23 K       26.16 μs    ±39.65%          24 μs          70 μs
+Concatenation                   4.33 K      230.99 μs    ±50.47%         213 μs      590.06 μs
+
+Comparison:
+Cons + Flatten                 38.68 K
+Cons + Reverse + Flatten       38.23 K - 1.01x slower +0.31 μs
+Concatenation                   4.33 K - 8.94x slower +205.13 μs
+```
+
+#### Putting into maps with `Map.put` and `put_in` [code](code/general/map_put_vs_put_in.exs)
+
+Do not put data into root of map with `put_in`. It is ~2x slower than `Map.put`. Also `put_in/2`
+is more effective than `put_in/3`.
+
+```
+$ mix run ./code/general/map_put_vs_put_in.exs
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
+Available memory: 16 GB
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
 
 Benchmark suite executing with the following configuration:
 warmup: 2 s
@@ -125,81 +291,7 @@ time: 10 s
 memory time: 0 ns
 parallel: 1
 inputs: Large (30,000 items), Medium (3,000 items), Small (30 items)
-Estimated total run time: 2.40 min
-
-Benchmarking Concatenation with input Large (30,000 items)...
-Benchmarking Concatenation with input Medium (3,000 items)...
-Benchmarking Concatenation with input Small (30 items)...
-Benchmarking Cons + Flatten with input Large (30,000 items)...
-Benchmarking Cons + Flatten with input Medium (3,000 items)...
-Benchmarking Cons + Flatten with input Small (30 items)...
-Benchmarking Cons + Reverse + Flatten with input Large (30,000 items)...
-Benchmarking Cons + Reverse + Flatten with input Medium (3,000 items)...
-Benchmarking Cons + Reverse + Flatten with input Small (30 items)...
-Benchmarking Reverse + Concatenation + Reverse with input Large (30,000 items)...
-Benchmarking Reverse + Concatenation + Reverse with input Medium (3,000 items)...
-Benchmarking Reverse + Concatenation + Reverse with input Small (30 items)...
-
-##### With input Large (30,000 items) #####
-Name                                        ips        average  deviation         median         99th %
-Cons + Flatten                           2.31 K      432.24 μs    ±14.99%      428.40 μs      476.00 μs
-Cons + Reverse + Flatten                 2.19 K      456.21 μs     ±3.51%      453.04 μs      505.64 μs
-Reverse + Concatenation + Reverse        1.49 K      670.44 μs    ±23.61%      665.81 μs      739.61 μs
-Concatenation                         0.00288 K   346621.03 μs     ±1.34%   345434.00 μs   358651.55 μs
-
-Comparison:
-Cons + Flatten                           2.31 K
-Cons + Reverse + Flatten                 2.19 K - 1.06x slower +23.97 μs
-Reverse + Concatenation + Reverse        1.49 K - 1.55x slower +238.20 μs
-Concatenation                         0.00288 K - 801.91x slower +346188.79 μs
-
-##### With input Medium (3,000 items) #####
-Name                                        ips        average  deviation         median         99th %
-Cons + Flatten                          25.56 K       39.13 μs    ±13.42%       37.81 μs       50.58 μs
-Cons + Reverse + Flatten                24.44 K       40.92 μs    ±14.20%       39.33 μs       48.14 μs
-Reverse + Concatenation + Reverse       19.26 K       51.93 μs    ±14.22%       48.62 μs       70.20 μs
-Concatenation                            0.27 K     3700.64 μs     ±4.96%     3672.52 μs     4387.75 μs
-
-Comparison:
-Cons + Flatten                          25.56 K
-Cons + Reverse + Flatten                24.44 K - 1.05x slower +1.80 μs
-Reverse + Concatenation + Reverse       19.26 K - 1.33x slower +12.80 μs
-Concatenation                            0.27 K - 94.58x slower +3661.51 μs
-
-##### With input Small (30 items) #####
-Name                                        ips        average  deviation         median         99th %
-Cons + Reverse + Flatten                 1.64 M      609.34 ns  ±4551.93%         483 ns         745 ns
-Concatenation                            1.59 M      627.84 ns  ±4177.04%         425 ns        1340 ns
-Cons + Flatten                           1.58 M      634.79 ns  ±5708.60%         465 ns        1291 ns
-Reverse + Concatenation + Reverse        1.56 M      642.68 ns  ±4112.06%         521 ns        1389 ns
-
-Comparison:
-Cons + Reverse + Flatten                 1.64 M
-Concatenation                            1.59 M - 1.03x slower +18.50 ns
-Cons + Flatten                           1.58 M - 1.04x slower +25.45 ns
-Reverse + Concatenation + Reverse        1.56 M - 1.05x slower +33.33 ns
-```
-
-#### Putting into maps with `Map.put` and `put_in` [code](code/general/map_put_vs_put_in.exs)
-
-Do not put data into root of map with `put_in`. It is ~2x slower than `Map.put`. Also `put_in/2` is more effective than `put_in/3`.
-
-```
-Operating System: macOS"
-CPU Information: Intel(R) Core(TM) i7-3520M CPU @ 2.90GHz
-Number of Available Cores: 4
-Available memory: 8 GB
-Elixir 1.7.4
-Erlang 21.2.2
-
-Benchmark suite executing with the following configuration:
-warmup: 2 s
-time: 10 s
-memory time: 0 μs
-parallel: 1
-inputs: Large (30,000 items), Medium (3,000 items), Small (30 items)
 Estimated total run time: 1.80 min
-
 
 Benchmarking Map.put/3 with input Large (30,000 items)...
 Benchmarking Map.put/3 with input Medium (3,000 items)...
@@ -213,36 +305,36 @@ Benchmarking put_in/3 with input Small (30 items)...
 
 ##### With input Large (30,000 items) #####
 Name                ips        average  deviation         median         99th %
-Map.put/3        265.12        3.77 ms    ±47.11%        3.33 ms       11.35 ms
-put_in/2         186.31        5.37 ms    ±21.17%        5.15 ms        8.67 ms
-put_in/3         158.40        6.31 ms    ±34.23%        5.84 ms       14.71 ms
+Map.put/3        247.43        4.04 ms    ±10.45%        3.97 ms        5.41 ms
+put_in/2         242.10        4.13 ms    ±12.48%        4.01 ms        5.74 ms
+put_in/3         221.53        4.51 ms    ±11.11%        4.41 ms        6.13 ms
 
 Comparison:
-Map.put/3        265.12
-put_in/2         186.31 - 1.42x slower
-put_in/3         158.40 - 1.67x slower
+Map.put/3        247.43
+put_in/2         242.10 - 1.02x slower +0.0888 ms
+put_in/3         221.53 - 1.12x slower +0.47 ms
 
 ##### With input Medium (3,000 items) #####
 Name                ips        average  deviation         median         99th %
-Map.put/3        5.68 K      175.93 μs   ±143.04%         151 μs         476 μs
-put_in/2         2.73 K      366.60 μs    ±34.11%         334 μs         829 μs
-put_in/3         2.44 K      409.76 μs    ±30.36%         372 μs      854.51 μs
+Map.put/3        5.68 K      175.98 μs    ±34.49%      150.98 μs      400.98 μs
+put_in/2         3.62 K      276.42 μs    ±23.76%      252.98 μs      546.98 μs
+put_in/3         3.09 K      323.22 μs    ±22.44%      296.98 μs      630.98 μs
 
 Comparison:
 Map.put/3        5.68 K
-put_in/2         2.73 K - 2.08x slower
-put_in/3         2.44 K - 2.33x slower
+put_in/2         3.62 K - 1.57x slower +100.44 μs
+put_in/3         3.09 K - 1.84x slower +147.23 μs
 
 ##### With input Small (30 items) #####
 Name                ips        average  deviation         median         99th %
-Map.put/3      677.44 K        1.48 μs  ±2879.99%           1 μs           3 μs
-put_in/2       362.48 K        2.76 μs  ±1833.30%           2 μs           5 μs
-put_in/3       337.47 K        2.96 μs  ±1141.45%           3 μs           5 μs
+Map.put/3     1040.86 K        0.96 μs  ±3795.74%        0.98 μs        1.98 μs
+put_in/2       400.53 K        2.50 μs  ±1295.21%        1.98 μs        2.98 μs
+put_in/3       338.63 K        2.95 μs  ±1124.35%        1.98 μs        3.98 μs
 
 Comparison:
-Map.put/3      677.44 K
-put_in/2       362.48 K - 1.87x slower
-put_in/3       337.47 K - 2.01x slower
+Map.put/3     1040.86 K
+put_in/2       400.53 K - 2.60x slower +1.54 μs
+put_in/3       338.63 K - 3.07x slower +1.99 μs
 ```
 
 #### Splitting Large Strings [code](code/general/string_split_large_strings.exs)
@@ -254,11 +346,11 @@ performance benefits.
 ```
 $ mix run code/general/string_split_large_strings.exs
 Operating System: macOS
-CPU Information: Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz
-Number of Available Cores: 12
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
 Available memory: 16 GB
-Elixir 1.10.1
-Erlang 22.2.7
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
 
 Benchmark suite executing with the following configuration:
 warmup: 2 s
@@ -283,79 +375,81 @@ Benchmarking splitter |> to_list with input Small string (1 Hundred Numbers)...
 
 ##### With input Large string (1 Million Numbers) #####
 Name                          ips        average  deviation         median         99th %
-split                       13.54       73.86 ms    ±30.85%       63.48 ms      130.82 ms
-splitter |> to_list          3.86      258.82 ms    ±20.13%      239.00 ms      420.32 ms
-split erlang                 1.22      819.31 ms     ±1.10%      822.40 ms      829.39 ms
-split regex                  0.86     1157.56 ms    ±11.00%     1112.62 ms     1389.42 ms
+split                       13.96       71.63 ms    ±29.57%       59.81 ms      121.28 ms
+splitter |> to_list          3.24      308.26 ms    ±14.54%      290.97 ms      442.09 ms
+split erlang                 1.09      919.28 ms     ±4.86%      939.75 ms      998.24 ms
+split regex                  0.78     1286.40 ms     ±9.80%     1253.48 ms     1489.63 ms
 
 Comparison:
-split                       13.54
-splitter |> to_list          3.86 - 3.50x slower +184.97 ms
-split erlang                 1.22 - 11.09x slower +745.45 ms
-split regex                  0.86 - 15.67x slower +1083.70 ms
+split                       13.96
+splitter |> to_list          3.24 - 4.30x slower +236.62 ms
+split erlang                 1.09 - 12.83x slower +847.65 ms
+split regex                  0.78 - 17.96x slower +1214.77 ms
 
 ##### With input Medium string (10 Thousand Numbers) #####
 Name                          ips        average  deviation         median         99th %
-split                     4243.75        0.24 ms    ±53.17%       0.196 ms        0.40 ms
-splitter |> to_list        456.08        2.19 ms    ±13.55%        2.21 ms        2.96 ms
-split erlang               174.75        5.72 ms     ±7.36%        5.74 ms        7.24 ms
-split regex                100.40        9.96 ms    ±58.15%        9.46 ms       14.53 ms
+split                     3813.15        0.26 ms    ±45.13%        0.21 ms        0.57 ms
+splitter |> to_list        397.04        2.52 ms    ±14.65%        2.48 ms        3.73 ms
+split erlang               137.55        7.27 ms     ±8.52%        7.17 ms        9.35 ms
+split regex                 93.73       10.67 ms     ±7.46%       10.56 ms       13.07 ms
 
 Comparison:
-split                     4243.75
-splitter |> to_list        456.08 - 9.30x slower +1.96 ms
-split erlang               174.75 - 24.28x slower +5.49 ms
-split regex                100.40 - 42.27x slower +9.72 ms
+split                     3813.15
+splitter |> to_list        397.04 - 9.60x slower +2.26 ms
+split erlang               137.55 - 27.72x slower +7.01 ms
+split regex                 93.73 - 40.68x slower +10.41 ms
 
 ##### With input Small string (1 Hundred Numbers) #####
 Name                          ips        average  deviation         median         99th %
-split                    389.84 K        2.57 μs  ±1112.00%           2 μs           4 μs
-splitter |> to_list       62.11 K       16.10 μs    ±81.51%          15 μs          40 μs
-split erlang              18.07 K       55.35 μs    ±59.21%          42 μs         162 μs
-split regex               11.20 K       89.25 μs    ±15.58%          86 μs         157 μs
+split                    365.94 K        2.73 μs   ±634.81%           2 μs          14 μs
+splitter |> to_list       45.63 K       21.92 μs    ±45.25%          20 μs          63 μs
+split erlang              14.19 K       70.48 μs    ±48.03%          53 μs      186.91 μs
+split regex                9.87 K      101.28 μs    ±24.68%          93 μs         222 μs
 
 Comparison:
-split                    389.84 K
-splitter |> to_list       62.11 K - 6.28x slower +13.54 μs
-split erlang              18.07 K - 21.58x slower +52.78 μs
-split regex               11.20 K - 34.79x slower +86.69 μs
+split                    365.94 K
+splitter |> to_list       45.63 K - 8.02x slower +19.18 μs
+split erlang              14.19 K - 25.79x slower +67.74 μs
+split regex                9.87 K - 37.06x slower +98.55 μs
 ```
 
 #### `sort` vs. `sort_by` [code](code/general/sort_vs_sort_by.exs)
 
-Sorting a list of maps or keyword lists can be done in various ways, given that
-the key-value you want to sort on is the first one defined in the associative
-data structure. The speed differences are minimal.
+Sorting a list of maps or keyword lists can be done in various ways. However, since the sort
+behavior is fairly implicit if you're sorting without a defined sort function, and since the
+speed difference is quite small, it's probably best to use `sort/2` or `sort_by/2` in all
+cases when sorting lists and maps (including keyword lists and structs).
 
 ```
 $ mix run code/general/sort_vs_sort_by.exs
 Operating System: macOS
-CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
-Number of Available Cores: 4
-Available memory: 8 GB
-Elixir 1.6.3
-Erlang 20.3
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
+Available memory: 16 GB
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
+
 Benchmark suite executing with the following configuration:
 warmup: 2 s
 time: 10 s
+memory time: 0 ns
 parallel: 1
 inputs: none specified
 Estimated total run time: 36 s
-
 
 Benchmarking sort/1...
 Benchmarking sort/2...
 Benchmarking sort_by/2...
 
 Name                ips        average  deviation         median         99th %
-sort/1           4.93 K      202.65 μs    ±21.42%         191 μs         409 μs
-sort/2           4.74 K      210.76 μs    ±18.83%         199 μs         394 μs
-sort_by/2        4.53 K      220.71 μs    ±34.84%         204 μs         438 μs
+sort/1           7.82 K      127.86 μs    ±23.45%         118 μs         269 μs
+sort/2           7.01 K      142.57 μs    ±22.48%         132 μs         294 μs
+sort_by/2        6.68 K      149.62 μs    ±22.70%         138 μs         308 μs
 
 Comparison:
-sort/1           4.93 K
-sort/2           4.74 K - 1.04x slower
-sort_by/2        4.53 K - 1.09x slower
+sort/1           7.82 K
+sort/2           7.01 K - 1.12x slower +14.71 μs
+sort_by/2        6.68 K - 1.17x slower +21.76 μs
 ```
 
 #### Retrieving state from persistent_terms vs ets tables vs. Gen Servers [code](code/general/ets_vs_gen_server_vs_persistent_term.exs)
@@ -389,6 +483,7 @@ parallel: 1
 inputs: none specified
 Estimated total run time: 36 s
 
+
 Benchmarking ets table...
 Benchmarking gen server...
 Benchmarking persistent term...
@@ -404,6 +499,49 @@ ets table             16.21 M - 6.34x slower +51.96 ns
 gen server             0.87 M - 117.83x slower +1135.81 ns
 ```
 
+#### Writing state in ets tables, persistent_term and Gen Servers [code](code/general/ets_vs_gen_server_write.exs)
+
+Not only is it faster to read from `ets` or `persistent_term` versus a `GenServer`, but it's also
+much faster to write state in these two options. If you have need for state that needs to be
+stored but without a lot of behavior around that state, `ets` or `persistent_term` is always going
+to be the better choice over a `GenServer`. `persistent_term` is the fastest to read from by far,
+but is global across the VM and also slower to write to, so in most cases `ets` will be the best
+choice for storing state and should be the default option to start with.
+
+```
+$ mix run code/general/ets_vs_gen_server_write.exs
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
+Available memory: 16 GB
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 10 s
+memory time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 36 s
+
+Benchmarking ets table...
+Benchmarking gen server...
+Benchmarking persistent term...
+
+Name                      ips        average  deviation         median         99th %
+ets table              5.22 M      191.61 ns   ±798.69%           0 ns        1000 ns
+persistent term        2.43 M      410.87 ns ±11324.51%           0 ns        1000 ns
+gen server             0.58 M     1715.61 ns   ±367.31%        2000 ns        2000 ns
+
+Comparison:
+ets table              5.22 M
+persistent term        2.43 M - 2.14x slower +219.26 ns
+gen server             0.58 M - 8.95x slower +1524.00 ns
+```
+
+
+
 #### Comparing strings vs. atoms [code](code/general/comparing_strings_vs_atoms.exs)
 
 Because atoms are stored in a special table in the BEAM, comparing atoms is
@@ -414,19 +552,21 @@ to convert strings to atoms solely for the perceived speed benefit, since it
 ends up being much slower than just comparing the strings, even dozens of times.
 
 ```
+$ mix run code/general/comparing_strings_vs_atoms.exs
 Operating System: macOS
-CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
-Number of Available Cores: 4
-Available memory: 8 GB
-Elixir 1.6.3
-Erlang 20.3
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
+Available memory: 16 GB
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
+
 Benchmark suite executing with the following configuration:
 warmup: 2 s
 time: 10 s
+memory time: 0 ns
 parallel: 1
 inputs: Large (1-100), Medium (1-50), Small (1-5)
 Estimated total run time: 1.80 min
-
 
 Benchmarking Comparing atoms with input Large (1-100)...
 Benchmarking Comparing atoms with input Medium (1-50)...
@@ -440,36 +580,36 @@ Benchmarking Converting to atoms and then comparing with input Small (1-5)...
 
 ##### With input Large (1-100) #####
 Name                                             ips        average  deviation         median         99th %
-Comparing atoms                               8.12 M       0.123 μs    ±54.10%       0.120 μs        0.22 μs
-Comparing strings                             6.94 M       0.144 μs    ±75.54%       0.140 μs        0.25 μs
-Converting to atoms and then comparing        0.68 M        1.47 μs   ±350.78%           1 μs           2 μs
+Comparing atoms                               3.74 M      267.46 ns ±12198.11%           0 ns        1000 ns
+Comparing strings                             3.71 M      269.25 ns ±11719.28%           0 ns        1000 ns
+Converting to atoms and then comparing        0.94 M     1065.67 ns   ±290.55%        1000 ns        2000 ns
 
 Comparison:
-Comparing atoms                               8.12 M
-Comparing strings                             6.94 M - 1.17x slower
-Converting to atoms and then comparing        0.68 M - 11.95x slower
+Comparing atoms                               3.74 M
+Comparing strings                             3.71 M - 1.01x slower +1.79 ns
+Converting to atoms and then comparing        0.94 M - 3.98x slower +798.21 ns
 
 ##### With input Medium (1-50) #####
 Name                                             ips        average  deviation         median         99th %
-Comparing atoms                               8.05 M       0.124 μs    ±86.21%       0.120 μs        0.23 μs
-Comparing strings                             6.91 M       0.145 μs    ±76.74%       0.140 μs        0.25 μs
-Converting to atoms and then comparing        1.00 M        1.00 μs   ±441.77%           1 μs           2 μs
+Comparing atoms                               3.70 M      270.08 ns ±11419.92%           0 ns        1000 ns
+Comparing strings                             3.68 M      271.52 ns ±11603.67%           0 ns        1000 ns
+Converting to atoms and then comparing        1.34 M      743.76 ns  ±2924.56%        1000 ns        1000 ns
 
 Comparison:
-Comparing atoms                               8.05 M
-Comparing strings                             6.91 M - 1.17x slower
-Converting to atoms and then comparing        1.00 M - 8.08x slower
+Comparing atoms                               3.70 M
+Comparing strings                             3.68 M - 1.01x slower +1.44 ns
+Converting to atoms and then comparing        1.34 M - 2.75x slower +473.68 ns
 
 ##### With input Small (1-5) #####
 Name                                             ips        average  deviation         median         99th %
-Comparing atoms                               7.99 M       0.125 μs    ±85.13%       0.120 μs        0.22 μs
-Comparing strings                             6.83 M       0.146 μs    ±78.46%       0.140 μs        0.25 μs
-Converting to atoms and then comparing        2.64 M        0.38 μs    ±51.12%        0.37 μs        0.59 μs
+Comparing atoms                               3.81 M      262.27 ns ±11438.39%           0 ns        1000 ns
+Comparing strings                             3.69 M      270.86 ns ±11945.32%           0 ns        1000 ns
+Converting to atoms and then comparing        2.45 M      407.62 ns  ±8371.44%           0 ns        1000 ns
 
 Comparison:
-Comparing atoms                               7.99 M
-Comparing strings                             6.83 M - 1.17x slower
-Converting to atoms and then comparing        2.64 M - 3.03x slower
+Comparing atoms                               3.81 M
+Comparing strings                             3.69 M - 1.03x slower +8.59 ns
+Converting to atoms and then comparing        2.45 M - 1.55x slower +145.34 ns
 ```
 
 ### spawn vs. spawn_link [code](code/general/spawn_vs_spawn_link.exs)
@@ -483,12 +623,13 @@ so that should still be favored in nearly every case in which processes need to
 be spawned.
 
 ```
+$ mix run code/general/spawn_vs_spawn_link.exs
 Operating System: macOS
-CPU Information: Intel(R) Core(TM) i5-4260U CPU @ 1.40GHz
-Number of Available Cores: 4
-Available memory: 8 GB
-Elixir 1.7.1
-Erlang 21.0
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
+Available memory: 16 GB
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
 
 Benchmark suite executing with the following configuration:
 warmup: 2 s
@@ -498,23 +639,22 @@ parallel: 1
 inputs: none specified
 Estimated total run time: 28 s
 
-
 Benchmarking spawn/1...
 Benchmarking spawn_link/1...
 
 Name                   ips        average  deviation         median         99th %
-spawn/1           507.24 K        1.97 μs  ±1950.75%           2 μs           3 μs
-spawn_link/1      436.03 K        2.29 μs  ±1224.66%           2 μs           4 μs
+spawn/1           636.00 K        1.57 μs  ±1512.39%           1 μs           2 μs
+spawn_link/1      576.18 K        1.74 μs  ±1402.58%           2 μs           2 μs
 
 Comparison:
-spawn/1           507.24 K
-spawn_link/1      436.03 K - 1.16x slower
+spawn/1           636.00 K
+spawn_link/1      576.18 K - 1.10x slower +0.163 μs
 
 Memory usage statistics:
 
 Name            Memory usage
-spawn/1                144 B
-spawn_link/1           144 B - 1.00x memory usage
+spawn/1                 72 B
+spawn_link/1            72 B - 1.00x memory usage +0 B
 
 **All measurements for memory usage were the same**
 ```
@@ -534,12 +674,13 @@ The one option you should avoid is using `Enum.flat_map/2` as it is both slower
 and has higher memory usage.
 
 ```
-Operating System: Linux
-CPU Information: Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz
-Number of Available Cores: 8
-Available memory: 15.39 GB
-Elixir 1.8.1
-Erlang 21.2.6
+$ mix run code/general/filter_map.exs
+Operating System: macOS
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
+Available memory: 16 GB
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
 
 Benchmark suite executing with the following configuration:
 warmup: 2 s
@@ -548,7 +689,6 @@ memory time: 10 ms
 parallel: 1
 inputs: Large, Medium, Small
 Estimated total run time: 2.40 min
-
 
 Benchmarking filter |> map with input Large...
 Benchmarking filter |> map with input Medium...
@@ -563,72 +703,72 @@ Benchmarking reduce |> reverse with input Large...
 Benchmarking reduce |> reverse with input Medium...
 Benchmarking reduce |> reverse with input Small...
 
-##### With input Small #####
+##### With input Large #####
 Name                        ips        average  deviation         median         99th %
-reduce |> reverse      167.19 K        5.98 μs   ±308.23%        5.18 μs       12.07 μs
-filter |> map          163.15 K        6.13 μs   ±296.65%        5.16 μs       11.98 μs
-for comprehension      157.76 K        6.34 μs   ±269.05%        5.39 μs       12.38 μs
-flat_map               116.20 K        8.61 μs   ±192.50%        7.69 μs       16.06 μs
+reduce |> reverse         12.12       82.51 ms     ±4.60%       81.46 ms       97.24 ms
+for comprehension         12.12       82.51 ms     ±4.53%       81.87 ms       94.38 ms
+filter |> map             10.78       92.75 ms     ±4.91%       92.15 ms      103.58 ms
+flat_map                   8.41      118.89 ms     ±3.22%      118.22 ms      134.28 ms
 
 Comparison:
-reduce |> reverse      167.19 K
-filter |> map          163.15 K - 1.02x slower
-for comprehension      157.76 K - 1.06x slower
-flat_map               116.20 K - 1.44x slower
+reduce |> reverse         12.12
+for comprehension         12.12 - 1.00x slower +0.00348 ms
+filter |> map             10.78 - 1.12x slower +10.24 ms
+flat_map                   8.41 - 1.44x slower +36.38 ms
 
 Memory usage statistics:
 
 Name                 Memory usage
-reduce |> reverse         1.19 KB
-filter |> map             1.70 KB - 1.43x memory usage
-for comprehension         1.19 KB - 1.00x memory usage
-flat_map                  1.59 KB - 1.34x memory usage
+reduce |> reverse         7.57 MB
+for comprehension         7.57 MB - 1.00x memory usage +0 MB
+filter |> map            13.28 MB - 1.75x memory usage +5.71 MB
+flat_map                 14.32 MB - 1.89x memory usage +6.75 MB
 
 **All measurements for memory usage were the same**
 
 ##### With input Medium #####
 Name                        ips        average  deviation         median         99th %
-reduce |> reverse        1.76 K      569.19 μs    ±17.54%      532.00 μs     1035.91 μs
-for comprehension        1.73 K      579.06 μs    ±14.77%      548.57 μs      938.81 μs
-filter |> map            1.72 K      582.49 μs    ±19.98%      536.60 μs     1069.09 μs
-flat_map                 1.21 K      824.01 μs    ±18.25%      765.08 μs     1535.27 μs
+for comprehension        1.27 K      788.69 μs    ±14.54%         732 μs     1287.38 μs
+reduce |> reverse        1.26 K      792.37 μs    ±14.73%         732 μs     1283.97 μs
+filter |> map            1.16 K      859.07 μs    ±14.68%         802 μs     1377.75 μs
+flat_map                 0.86 K     1157.55 μs    ±15.68%        1093 μs     1838.80 μs
 
 Comparison:
-reduce |> reverse        1.76 K
-for comprehension        1.73 K - 1.02x slower
-filter |> map            1.72 K - 1.02x slower
-flat_map                 1.21 K - 1.45x slower
+for comprehension        1.27 K
+reduce |> reverse        1.26 K - 1.00x slower +3.68 μs
+filter |> map            1.16 K - 1.09x slower +70.38 μs
+flat_map                 0.86 K - 1.47x slower +368.87 μs
 
 Memory usage statistics:
 
 Name                 Memory usage
-reduce |> reverse        57.13 KB
-for comprehension        57.13 KB - 1.00x memory usage
-filter |> map           109.15 KB - 1.91x memory usage
-flat_map                117.48 KB - 2.06x memory usage
+for comprehension        57.13 KB
+reduce |> reverse        57.13 KB - 1.00x memory usage +0 KB
+filter |> map           109.12 KB - 1.91x memory usage +51.99 KB
+flat_map                130.66 KB - 2.29x memory usage +73.54 KB
 
 **All measurements for memory usage were the same**
 
-##### With input Large #####
+##### With input Small #####
 Name                        ips        average  deviation         median         99th %
-for comprehension         16.48       60.68 ms    ±11.70%       58.62 ms       91.09 ms
-filter |> map             16.35       61.15 ms    ±12.88%       59.24 ms       89.90 ms
-reduce |> reverse         16.20       61.72 ms    ±14.36%       57.73 ms       83.17 ms
-flat_map                  11.71       85.43 ms    ±13.90%       78.94 ms      113.50 ms
+reduce |> reverse      121.39 K        8.24 μs   ±179.26%           8 μs          30 μs
+for comprehension      121.20 K        8.25 μs   ±180.01%           8 μs          30 μs
+filter |> map          111.29 K        8.99 μs   ±144.77%           8 μs          31 μs
+flat_map                85.08 K       11.75 μs   ±119.95%          11 μs          37 μs
 
 Comparison:
-for comprehension         16.48
-filter |> map             16.35 - 1.01x slower
-reduce |> reverse         16.20 - 1.02x slower
-flat_map                  11.71 - 1.41x slower
+reduce |> reverse      121.39 K
+for comprehension      121.20 K - 1.00x slower +0.0133 μs
+filter |> map          111.29 K - 1.09x slower +0.75 μs
+flat_map                85.08 K - 1.43x slower +3.52 μs
 
 Memory usage statistics:
 
 Name                 Memory usage
-for comprehension         8.16 MB
-filter |> map            13.34 MB - 1.63x memory usage
-reduce |> reverse         8.16 MB - 1.00x memory usage
-flat_map                 13.64 MB - 1.67x memory usage
+reduce |> reverse         1.09 KB
+for comprehension         1.09 KB - 1.00x memory usage +0 KB
+filter |> map             1.60 KB - 1.46x memory usage +0.51 KB
+flat_map                  1.62 KB - 1.48x memory usage +0.52 KB
 
 **All measurements for memory usage were the same**
 ```
@@ -639,12 +779,13 @@ From `String.slice/3` [documentation](https://hexdocs.pm/elixir/String.html#slic
 Remember this function works with Unicode graphemes and considers the slices to represent grapheme offsets. If you want to split on raw bytes, check `Kernel.binary_part/3` instead.
 
 ```
+$ mix run code/general/string_slice.exs
 Operating System: macOS
-CPU Information: Intel(R) Core(TM) i7-8850H CPU @ 2.60GHz
-Number of Available Cores: 12
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
 Available memory: 16 GB
-Elixir 1.9.1
-Erlang 22.0.7
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
 
 Benchmark suite executing with the following configuration:
 warmup: 100 ms
@@ -663,14 +804,14 @@ Benchmarking binary_part/3 with input Small string (10 Numbers)...
 
 ##### With input Large string (10 Thousand Numbers) #####
 Name                     ips        average  deviation         median         99th %
-binary_part/3        17.23 M       58.03 ns  ±4513.98%          80 ns         180 ns
-:binary.part/3        3.96 M      252.32 ns  ±8577.24%           0 ns         980 ns
-String.slice/3        1.39 M      720.21 ns   ±755.41%         980 ns         980 ns
+binary_part/3        11.14 M       89.78 ns  ±2513.45%         100 ns         200 ns
+:binary.part/3        3.59 M      278.65 ns  ±9466.55%           0 ns        1000 ns
+String.slice/3        0.90 M     1112.12 ns   ±440.40%        1000 ns        2000 ns
 
 Comparison:
-binary_part/3        17.23 M
-:binary.part/3        3.96 M - 4.35x slower +194.29 ns
-String.slice/3        1.39 M - 12.41x slower +662.18 ns
+binary_part/3        11.14 M
+:binary.part/3        3.59 M - 3.10x slower +188.87 ns
+String.slice/3        0.90 M - 12.39x slower +1022.34 ns
 
 Memory usage statistics:
 
@@ -683,14 +824,14 @@ String.slice/3           880 B - ∞ x memory usage +880 B
 
 ##### With input Small string (10 Numbers) #####
 Name                     ips        average  deviation         median         99th %
-binary_part/3        17.25 M       57.97 ns  ±4482.36%          80 ns         180 ns
-:binary.part/3       15.71 M       63.64 ns  ±6789.17%          80 ns          80 ns
-String.slice/3        1.38 M      726.17 ns  ±1532.43%         980 ns         980 ns
+binary_part/3         3.64 M      274.57 ns  ±7776.31%           0 ns        1000 ns
+:binary.part/3        3.56 M      281.06 ns  ±9071.16%           0 ns        1000 ns
+String.slice/3        0.91 M     1103.31 ns   ±246.39%        1000 ns        2000 ns
 
 Comparison:
-binary_part/3        17.25 M
-:binary.part/3       15.71 M - 1.10x slower +5.67 ns
-String.slice/3        1.38 M - 12.53x slower +668.20 ns
+binary_part/3         3.64 M
+:binary.part/3        3.56 M - 1.02x slower +6.48 ns
+String.slice/3        0.91 M - 4.02x slower +828.73 ns
 
 Memory usage statistics:
 
@@ -713,12 +854,13 @@ the key and value), and it's this difference that is responsible for the
 decreased execution time and memory usage.
 
 ```
+$ mix run code/general/filtering_maps.exs
 Operating System: macOS
-CPU Information: Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz
-Number of Available Cores: 12
+CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+Number of Available Cores: 16
 Available memory: 16 GB
-Elixir 1.9.1
-Erlang 22.1.2
+Elixir 1.11.0-rc.0
+Erlang 23.0.2
 
 Benchmark suite executing with the following configuration:
 warmup: 2 s
@@ -743,62 +885,62 @@ Benchmarking for with input Small (1)...
 
 ##### With input Large (10_000) #####
 Name                                   ips        average  deviation         median         99th %
-:maps.filter                        787.95        1.27 ms    ±17.36%        1.24 ms        2.09 ms
-for                                 734.04        1.36 ms    ±24.47%        1.31 ms        1.85 ms
-Enum.filter/2 |> Enum.into/2        712.02        1.40 ms    ±29.52%        1.37 ms        1.83 ms
-Enum.filter/2 |> Map.new/1          704.65        1.42 ms    ±27.76%        1.38 ms        1.89 ms
+:maps.filter                        669.86        1.49 ms    ±14.38%        1.44 ms        2.31 ms
+Enum.filter/2 |> Enum.into/2        532.59        1.88 ms    ±19.86%        1.78 ms        2.87 ms
+Enum.filter/2 |> Map.new/1          527.37        1.90 ms    ±25.17%        1.79 ms        2.85 ms
+for                                 524.51        1.91 ms    ±31.33%        1.80 ms        2.83 ms
 
 Comparison:
-:maps.filter                        787.95
-for                                 734.04 - 1.07x slower +0.0932 ms
-Enum.filter/2 |> Enum.into/2        712.02 - 1.11x slower +0.135 ms
-Enum.filter/2 |> Map.new/1          704.65 - 1.12x slower +0.150 ms
+:maps.filter                        669.86
+Enum.filter/2 |> Enum.into/2        532.59 - 1.26x slower +0.38 ms
+Enum.filter/2 |> Map.new/1          527.37 - 1.27x slower +0.40 ms
+for                                 524.51 - 1.28x slower +0.41 ms
 
 Memory usage statistics:
 
 Name                            Memory usage
-:maps.filter                       700.70 KB
-for                                802.84 KB - 1.15x memory usage +102.14 KB
-Enum.filter/2 |> Enum.into/2       802.86 KB - 1.15x memory usage +102.16 KB
-Enum.filter/2 |> Map.new/1         802.86 KB - 1.15x memory usage +102.16 KB
+:maps.filter                       780.45 KB
+Enum.filter/2 |> Enum.into/2       782.85 KB - 1.00x memory usage +2.41 KB
+Enum.filter/2 |> Map.new/1         782.87 KB - 1.00x memory usage +2.42 KB
+for                                782.86 KB - 1.00x memory usage +2.41 KB
 
 **All measurements for memory usage were the same**
 
 ##### With input Medium (100) #####
 Name                                   ips        average  deviation         median         99th %
-:maps.filter                      100.64 K        9.94 μs   ±175.28%           9 μs          26 μs
-Enum.filter/2 |> Map.new/1         85.42 K       11.71 μs   ±110.89%          11 μs          32 μs
-for                                81.34 K       12.29 μs   ±132.99%          11 μs          32 μs
-Enum.filter/2 |> Enum.into/2       80.41 K       12.44 μs   ±120.11%          12 μs          31 μs
+:maps.filter                       76.01 K       13.16 μs    ±90.13%          12 μs          42 μs
+Enum.filter/2 |> Map.new/1         61.19 K       16.34 μs    ±61.27%          15 μs          50 μs
+for                                60.89 K       16.42 μs    ±65.36%          15 μs          51 μs
+Enum.filter/2 |> Enum.into/2       60.60 K       16.50 μs    ±60.52%          15 μs          51 μs
 
 Comparison:
-:maps.filter                      100.64 K
-Enum.filter/2 |> Map.new/1         85.42 K - 1.18x slower +1.77 μs
-for                                81.34 K - 1.24x slower +2.36 μs
-Enum.filter/2 |> Enum.into/2       80.41 K - 1.25x slower +2.50 μs
+:maps.filter                       76.01 K
+Enum.filter/2 |> Map.new/1         61.19 K - 1.24x slower +3.19 μs
+for                                60.89 K - 1.25x slower +3.27 μs
+Enum.filter/2 |> Enum.into/2       60.60 K - 1.25x slower +3.35 μs
 
 Memory usage statistics:
 
 Name                            Memory usage
-:maps.filter                         5.70 KB
-Enum.filter/2 |> Map.new/1           7.84 KB - 1.38x memory usage +2.15 KB
-for                                  7.84 KB - 1.38x memory usage +2.15 KB
-Enum.filter/2 |> Enum.into/2         7.84 KB - 1.38x memory usage +2.15 KB
+:maps.filter                         5.67 KB
+Enum.filter/2 |> Map.new/1           7.84 KB - 1.38x memory usage +2.17 KB
+for                                  7.84 KB - 1.38x memory usage +2.17 KB
+Enum.filter/2 |> Enum.into/2         7.84 KB - 1.38x memory usage +2.17 KB
 
 **All measurements for memory usage were the same**
 
 ##### With input Small (1) #####
 Name                                   ips        average  deviation         median         99th %
-:maps.filter                        2.74 M      365.22 ns  ±9695.02%           0 ns        1000 ns
-for                                 2.05 M      487.50 ns  ±6665.49%           0 ns        1000 ns
-Enum.filter/2 |> Map.new/1          1.97 M      508.17 ns  ±9786.44%           0 ns        1000 ns
-Enum.filter/2 |> Enum.into/2        1.86 M      536.23 ns ±10066.95%           0 ns        1000 ns
+:maps.filter                        2.46 M      406.55 ns  ±6862.02%           0 ns        1000 ns
+for                                 1.81 M      551.70 ns  ±4974.10%           0 ns        1000 ns
+Enum.filter/2 |> Map.new/1          1.78 M      562.13 ns  ±5004.53%           0 ns        1000 ns
+Enum.filter/2 |> Enum.into/2        1.64 M      608.18 ns  ±4796.51%        1000 ns        1000 ns
 
 Comparison:
-:maps.filter                        2.74 M
-for                                 2.05 M - 1.33x slower +122.28 ns
-Enum.filter/2 |> Map.new/1          1.97 M - 1.39x slower +142.95 ns
-Enum.filter/2 |> Enum.into/2        1.86 M - 1.47x slower +171.01 ns
+:maps.filter                        2.46 M
+for                                 1.81 M - 1.36x slower +145.15 ns
+Enum.filter/2 |> Map.new/1          1.78 M - 1.38x slower +155.58 ns
+Enum.filter/2 |> Enum.into/2        1.64 M - 1.50x slower +201.63 ns
 
 Memory usage statistics:
 
