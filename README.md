@@ -452,7 +452,7 @@ sort/2           7.01 K - 1.12x slower +14.71 μs
 sort_by/2        6.68 K - 1.17x slower +21.76 μs
 ```
 
-#### Retrieving state from ets tables vs. Gen Servers [code](code/general/ets_vs_gen_server.exs)
+#### Retrieving state from persistent_terms vs ets tables vs. Gen Servers [code](code/general/ets_vs_gen_server_vs_persistent_term.exs)
 
 There are many differences between Gen Servers and ets tables, but many people
 have often praised ets tables for being extremely fast. For the simple case of
@@ -461,14 +461,19 @@ faster for reads. For more complicated use cases, and for comparisons of writes
 instead of reads, further benchmarks are needed, but so far ets lives up to its
 reputation for speed.
 
+Persistent Terms, on the other hand, have the advantage of a simpler interface, but
+aren't fit for all applications due to their global nature. Also, they are by design
+optimized for reading instead of writing, which renders them unfit in applications which
+need to rewrite the state a lot.
+
 ```
-$ mix run code/general/ets_vs_gen_server.exs
-Operating System: macOS
-CPU Information: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
-Number of Available Cores: 16
-Available memory: 16 GB
-Elixir 1.11.0-rc.0
-Erlang 23.0.2
+$ mix run ./code/general/ets_vs_gen_server_vs_persistent_term.exs
+Operating System: Linux
+CPU Information: Intel(R) Core(TM) i7-9700KF CPU @ 3.60GHz
+Number of Available Cores: 8
+Available memory: 31.28 GB
+Elixir 1.9.1
+Erlang 22.1.2
 
 Benchmark suite executing with the following configuration:
 warmup: 2 s
@@ -476,18 +481,22 @@ time: 10 s
 memory time: 0 ns
 parallel: 1
 inputs: none specified
-Estimated total run time: 24 s
+Estimated total run time: 36 s
+
 
 Benchmarking ets table...
 Benchmarking gen server...
+Benchmarking persistent term...
 
-Name                 ips        average  deviation         median         99th %
-ets table         5.11 M       0.196 μs  ±8972.86%           0 μs        0.98 μs
-gen server        0.55 M        1.82 μs   ±997.04%        1.98 μs        2.98 μs
+Name                      ips        average  deviation         median         99th %
+persistent term      102.86 M        9.72 ns  ±1263.61%           8 ns          17 ns
+ets table             16.21 M       61.68 ns ±50527.06%          34 ns          80 ns
+gen server             0.87 M     1145.54 ns  ±1353.69%        1086 ns        1403 ns
 
 Comparison:
-ets table         5.11 M
-gen server        0.55 M - 9.31x slower +1.63 μs
+persistent term      102.86 M
+ets table             16.21 M - 6.34x slower +51.96 ns
+gen server             0.87 M - 117.83x slower +1135.81 ns
 ```
 
 #### Writing state in ets tables, persistent_term and Gen Servers [code](code/general/ets_vs_gen_server_write.exs)
