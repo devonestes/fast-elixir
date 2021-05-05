@@ -36,7 +36,7 @@ defmodule ListAdd.Benchmark do
     "100 small items" => {1..100, @small_list},
     "10 small items" => {1..10, @small_list},
     "1,000 large items" => {1..1_000, @large_list},
-    "100 large items" => {1..1000, @large_list},
+    "100 large items" => {1..100, @large_list},
     "10 large items" => {1..10, @large_list},
   }
 
